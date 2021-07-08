@@ -48,6 +48,7 @@ packagesFWM=(
   "lxrandr"
   "nitrogen"
   "lxdm-gtk3"
+  "lxdm-gtk3"
   "ttf-dejavu"
   "noto-fonts"
   "pcmanfm"
@@ -149,6 +150,7 @@ cd /mnt
 # Instalando pacotes
 for p in ${packages[@]}; do
   systemd-nspawn pacman -S $p --noconfirm
+  read -p 'esperando interação ... ' interacao
 done
 
 # Instalando GRUB
