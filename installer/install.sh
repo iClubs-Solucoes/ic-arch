@@ -158,8 +158,9 @@ cd /mnt
 
 # Instalando pacotes
 for p in ${packages[@]}; do
+  echo 'instalando '$p
+  read -p -t 10 'esperando interação ... ' interacao
   systemd-nspawn pacman -S $p --noconfirm
-  read -p 'esperando interação ... ' interacao
 done
 
 # Instalando GRUB
