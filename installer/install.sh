@@ -53,35 +53,6 @@ packagesFWM=(
   "pcmanfm"
 )
 
-packagesDevTools=(
-  "nodejs"
-  "docker"
-  "npm"
-)
-
-packagesAUR=(
-  
-)
-
-packagesAURFWM=(
-  "i3lock-color"
-  "polybar"
-  "betterlockscreen"
-  "nerd-fonts-complete"
-)
-
-packagesAURTWM=(
-  
-)
-
-packagesAURDevTools=(
-  "visual-studio-code-bin"
-  "beekeeper-studio-bin"
-  "google-chrome"
-  "insomnia"
-  "docker-compose"
-)
-
 # Inicio do script de instalação
 echo '----------------------------------------------'
 echo '|           ARCH DARK INSTALLER              |'
@@ -120,24 +91,10 @@ echo ''
 read -p '(padrão = 1): ' installUi
 echo ''
 
-case $installUi in
-  2)
-    # packages+=("${packagesMinimum[@]}")
-  ;;
-  *)
-    packages+=("${packagesFWM[@]}")
-    packagesAUR+=("${packagesAURFWM[@]}")
-  ;;
-esac
-
 echo ''
-read -p 'Você gostaria de instalar softwares de desenvolvimento? (N,y): ' installDevTools
+echo 'Você gostaria de instalar o assistente yay para pacotes AUR?'
+read -p '(N,y): ' installYay
 echo ''
-
-if [ $installDevTools == 'y' ]
-then
-  packagesAUR+=("${packagesAURDevTools[@]}")
-fi
 
 echo ''
 read -p 'Digite o nome de sua maquina: ' installHostName
@@ -170,14 +127,9 @@ echo ''
 # Particiona o disco
 parted $installDisk mklabel msdos 
 ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
-echo i | parted -a opt $installDisk mkpart primary linux-swap 2048 $installDiskSwapSize
+echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
 echo i | parted -a opt $installDisk mkpart primary ext4 $installDiskSwapSize 100%
 parted -a opt $installDisk set 2 boot on
-
-# Script de instalação de AUR
-# installAUR(){
-
-# }
 
 # Formata o disco
 mkfs.ext4 $installDisk'2'
@@ -206,23 +158,11 @@ arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 # Define senha padrão para root e cria usuarios
 systemd-nspawn useradd -m -g users -G wheel -p '' $installNewUser
 
-cd /home/$installNewUser
-systemd-nspawn git clone https://aur.archlinux.org/yay
-cd yay
-systemd-nspawn sudo $installNewUser 
-systemd-nspawn makepkg -S
-systemd-nspawn makepkg --install 
-
-# if [ $installDevTools == 'y' ]
-# then
-#   packagesAUR+=("${packagesAURDevTools[@]}")
-# fi
-
 # Copiando folder de instalação para o sistema novo
-cp /root/arch /mnt/home/$installNewUser -r
+cp /root/archdev /mnt/home/$installNewUser -r
 
 # Removendo password pra comandos sudo para instalação
-cp /mnt/home/$installNewUser/arch/Config/Install\ sudo/* /mnt/etc/ -r
+# cp /mnt/home/$installNewUser/arch/Config/Install\ sudo/* /mnt/etc/ -r
 
 # Configuração basica de systema
 systemd-nspawn ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
@@ -238,53 +178,57 @@ systemd-nspawn echo '127.0.0.1  '$installHostName'.localdomain  localhost' >> /e
 echo 'Initializing Installation'
 
 # Criando pasta temporaria
-mkdir ~/.installtemp
+# mkdir /mnt/home/.installtemp
 
 # Copiando arquivos usados na instalação
-cp ./installer ~/.installtemp -r
-cp ./Config ~/.installtemp -r
-cp ./LoginManager ~/.installtemp -r
-cp ./fonts ~/.installtemp -r
-cp ./LookAndFeel ~/.installtemp -r
+# cp /mnt/home/$installNewUser/archdevinstaller ~/.installtemp -r
+# cp /mnt/home/$installNewUser/archdevConfig ~/.installtemp -r
+# cp /mnt/home/$installNewUser/archdevLoginManager ~/.installtemp -r
+# cp /mnt/home/$installNewUser/archdevfonts ~/.installtemp -r
+# cp /mnt/home/$installNewUser/archdevLookAndFeel ~/.installtemp -r
 
 # Instalando yay
-# cd ~/.installtemp
-# git clone https://aur.archlinux.org/yay
-# cd yay
-# makepkg -S
-# makepkg --install --noconfirm
+case $installYay in
+  y)
+    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.gz
+  ;;
+  *)
+
+  ;;
+esac
 
 # Instalando aplicações complementares para open box
-# yay -S polybar google-chrome nerd-fonts-complete i3lock-color betterlockscreen --noconfirm
-# sudo -S pacman -S nodejs npm --noconfirm
-# sudo -S npm i -g yarn
-# yay -S polybar i3lock-color betterlockscreen --noconfirm
+case $installUi in
+  2)
 
-# Instalando aplicações para ambiente de desenvolvimento
-# yay -S visual-studio-code-bin insomnia beekeeper-studio-bin --noconfirm
+  ;;
+  *)
+    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/polybar.pkg.tar.gz
+  ;;
+esac
+# systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.gz
 
 # Habilitando interface gráfica
 systemd-nspawn systemctl enable NetworkManager.service
 systemd-nspawn systemctl enable lxdm.service
 
 # Configurando interface gráfica
-cd ~/.installtemp
-cp ./LookAndFeel/Theme/ /usr/share/themes/ArchDark -r
-cp ./LookAndFeel/Icons/ /usr/share/icons/ArchDark -r
-cp ./LookAndFeel/Config/Themes/GTK2/gtkrc /usr/share/gtk-2.0/gtkrc -r
-cp ./LookAndFeel/Config/Themes/GTK3/settings.ini /usr/share/gtk-3.0/settings.ini -r
-cp ./LookAndFeel/Config/Themes/Icons/index.theme /usr/share/icons/default/index.theme -r
-cp ./LookAndFeel/Config/Openbox/* /etc/xdg/openbox/ -r
-cp ./LookAndFeel/Plank/Theme/* /usr/share/plank/themes/Default/ -r
-cp ./LookAndFeel/Polybar/Theme/ /usr/share/doc/polybar/ArchDark/ -r
-cp ./LoginManager/Config/lxdm.conf /etc/lxdm/
-cp ./LoginManager/Themes/* /usr/share/lxdm/themes/ArchDark -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/ /usr/share/themes/ArchDark -r
+cp /mnt/home/$installNewUser/archdevLookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
+cp /mnt/home/$installNewUser/archdevLookAndFeel/Config/Themes/GTK2/gtkrc /mnt/usr/share/gtk-2.0/gtkrc -r
+cp /mnt/home/$installNewUser/archdevLookAndFeel/Config/Themes/GTK3/settings.ini /mnt/usr/share/gtk-3.0/settings.ini -r
+cp /mnt/home/$installNewUser/archdevLookAndFeel/Config/Themes/Icons/index.theme /mnt/usr/share/icons/default/index.theme -r
+cp /mnt/home/$installNewUser/archdevLookAndFeel/Config/Openbox/* /mnt/etc/xdg/openbox/ -r
+cp /mnt/home/$installNewUser/archdevLookAndFeel/Plank/Theme/* /mnt/usr/share/plank/themes/Default/ -r
+cp /mnt/home/$installNewUser/archdevLookAndFeel/Polybar/Theme/ /mnt/usr/share/doc/polybar/ArchDark/ -r
+cp /mnt/home/$installNewUser/archdevLoginManager/Config/lxdm.conf /mnt/etc/lxdm/
+cp /mnt/home/$installNewUser/archdevLoginManager/Themes/* /mnt/usr/share/lxdm/themes/ArchDark -r
 
 # Instalando fontes
-~/.installtemp/installer/installfonts.sh
+# ~/.installtemp/installer/installfonts.sh
 
 # Removendo pasta temporaria
-rm -rf ~/.installtemp
+# rm -rf ~/.installtemp
 
 # Mostrando neofetch para mostrar o fim do processo
 # clear
@@ -293,3 +237,7 @@ arch-chroot /mnt neofetch
 
 # Rebootando
 # reboot
+
+## Infos Extras
+# Para compilar pacotes AUR é necessario usar o comando extra-x86_64-build, esse comando ira gerar um instalaverl .pkg.tar.gz
+# use the systemd-nspawn --user=user to run commands as a specific user
