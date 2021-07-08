@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=ArchDark
+Comment=An Stylish Gtk+ theme based on Elegant Design
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=ArchDark
+MetacityTheme=ArchDark
+IconTheme=ArchDark
+CursorTheme=ArchDark
+ButtonLayout=close,minimize,maximize:menu
