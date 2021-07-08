@@ -185,7 +185,7 @@ echo 'Initializing Installation'
 # cp /mnt/home/$installNewUser/archdevConfig ~/.installtemp -r
 # cp /mnt/home/$installNewUser/archdevLoginManager ~/.installtemp -r
 # cp /mnt/home/$installNewUser/archdevfonts ~/.installtemp -r
-# cp /mnt/home/$installNewUser/archdevLookAndFeel ~/.installtemp -r
+# cp /mnt/home/$installNewUser/archdev/LookAndFeel ~/.installtemp -r
 
 # Instalando yay
 case $installYay in
@@ -214,15 +214,15 @@ systemd-nspawn systemctl enable lxdm.service
 
 # Configurando interface gráfica
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/ /usr/share/themes/ArchDark -r
-cp /mnt/home/$installNewUser/archdevLookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
-cp /mnt/home/$installNewUser/archdevLookAndFeel/Config/Themes/GTK2/gtkrc /mnt/usr/share/gtk-2.0/gtkrc -r
-cp /mnt/home/$installNewUser/archdevLookAndFeel/Config/Themes/GTK3/settings.ini /mnt/usr/share/gtk-3.0/settings.ini -r
-cp /mnt/home/$installNewUser/archdevLookAndFeel/Config/Themes/Icons/index.theme /mnt/usr/share/icons/default/index.theme -r
-cp /mnt/home/$installNewUser/archdevLookAndFeel/Config/Openbox/* /mnt/etc/xdg/openbox/ -r
-cp /mnt/home/$installNewUser/archdevLookAndFeel/Plank/Theme/* /mnt/usr/share/plank/themes/Default/ -r
-cp /mnt/home/$installNewUser/archdevLookAndFeel/Polybar/Theme/ /mnt/usr/share/doc/polybar/ArchDark/ -r
-cp /mnt/home/$installNewUser/archdevLoginManager/Config/lxdm.conf /mnt/etc/lxdm/
-cp /mnt/home/$installNewUser/archdevLoginManager/Themes/* /mnt/usr/share/lxdm/themes/ArchDark -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK2/gtkrc /mnt/usr/share/gtk-2.0/gtkrc -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK3/settings.ini /mnt/usr/share/gtk-3.0/settings.ini -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/Icons/index.theme /mnt/usr/share/icons/default/index.theme -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Openbox/* /mnt/etc/xdg/openbox/ -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Plank/Theme/* /mnt/usr/share/plank/themes/Default/ -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Polybar/Theme/ /mnt/usr/share/doc/polybar/ArchDark/ -r
+cp /mnt/home/$installNewUser/archdev/LoginManager/Config/lxdm.conf /mnt/etc/lxdm/
+cp /mnt/home/$installNewUser/archdev/LoginManager/Themes/* /mnt/usr/share/lxdm/themes/ArchDark -r
 
 # Instalando fontes
 # ~/.installtemp/installer/installfonts.sh
