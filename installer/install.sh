@@ -92,6 +92,15 @@ echo ''
 read -p '(padrão = 1): ' installUi
 echo ''
 
+case $installUi in
+  2)
+    # packages+=("${packagesMinimum[@]}")
+  ;;
+  *)
+    packages+=("${packagesFWM[@]}")
+  ;;
+esac
+
 echo ''
 echo 'Você gostaria de instalar o assistente yay para pacotes AUR?'
 read -p '(N,y): ' installYay
