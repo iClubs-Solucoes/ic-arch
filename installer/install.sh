@@ -159,7 +159,7 @@ cd /mnt
 # Instalando pacotes
 for p in ${packages[@]}; do
   echo 'instalando '$p
-  read -p -t10 'esperando interação ... ' STOPPER
+  read -t 10 -p 'esperando interação ... ' STOPPER
   systemd-nspawn pacman -S $p --noconfirm
 done
 
