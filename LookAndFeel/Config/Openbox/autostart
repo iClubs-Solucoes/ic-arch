@@ -1,4 +1,5 @@
 
+nitrogen --set-scaled /usr/share/lxdm/themes/ArchDark/background.png &
 nitrogen --restore &
 nitrogen --set-scaled /usr/share/lxdm/themes/ArchDark/background.png &
 setxkbmap br &

@@ -170,8 +170,6 @@ arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 # Define senha padrão para root e cria usuarios
 arch-chroot /mnt useradd -m -g users -G wheel -p '' $installNewUser
-# arch-chroot /mnt useradd -m -g users -G wheel $installNewUser
-# arch-chroot /mnt passwd $installNewUser
 
 # Copiando folder de instalação para o sistema novo
 cp /root/archdev /mnt/home/$installNewUser -r
@@ -203,15 +201,8 @@ case $installYay in
 esac
 
 # Instalando aplicações complementares para open box
-case $installUi in
-  2)
-
-  ;;
-  *)
-    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/polybar.pkg.tar.zst --noconfirm
-  ;;
-esac
-# systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.gz
+systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/polybar.pkg.tar.zst --noconfirm
+systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/betterlockscreen.pkg.tar.zst --noconfirm
 
 # Habilitando interface gráfica
 systemd-nspawn systemctl enable NetworkManager.service
@@ -232,16 +223,17 @@ cp /mnt/home/$installNewUser/archdev/LoginManager/Themes/* /mnt/usr/share/lxdm/t
 # Instalando fontes
 cp -rf /mnt/home/$installNewUser/archdev/Fonts/* /mnt/usr/share/fonts
 
-# Removendo pasta temporaria
-# rm -rf ~/.installtemp
-
 # Mostrando neofetch para mostrar o fim do processo
-# clear
+clear
+echo '----------------------------------------------'
+echo '|            ARCH DEV INSTALLER              |'
+echo '----------------------------------------------'
+echo 'Instalação finalizada'
 arch-chroot /mnt neofetch
-# read -p 'press any key to continue.....' stoper
+read -p 'press any key to continue.....' STOPPER
 
 # Rebootando
-# reboot
+reboot
 
 ## Infos Extras
 # Para compilar pacotes AUR é necessario usar o comando extra-x86_64-build, esse comando ira gerar um instalaverl .pkg.tar.gz
