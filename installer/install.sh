@@ -225,7 +225,7 @@ systemd-nspawn systemctl enable NetworkManager.service
 systemd-nspawn systemctl enable lxdm.service
 
 # Configurando interface gráfica
-cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/ /usr/share/themes/ArchDark -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/ /mnt/usr/share/themes/ArchDark -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK2/gtkrc /mnt/usr/share/gtk-2.0/gtkrc -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK3/settings.ini /mnt/usr/share/gtk-3.0/settings.ini -r
