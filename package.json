@@ -1,0 +1,21 @@
+{
+  "name": "arch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/fulviocoelho/arch",
+  "author": "Fulvio Coelho <coelho.fulvio@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^6.0.0"
+  },
+  "scripts": {
+    "osinstall": "./installer/install.sh"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
