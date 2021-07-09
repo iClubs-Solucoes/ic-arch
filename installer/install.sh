@@ -195,7 +195,7 @@ echo 'Initializing Installation'
 # Instalando yay
 case $installYay in
   y)
-    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.zst
+    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.zst --noconfirm
   ;;
   *)
 
@@ -208,7 +208,7 @@ case $installUi in
 
   ;;
   *)
-    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/polybar.pkg.tar.zst
+    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/polybar.pkg.tar.zst --noconfirm
   ;;
 esac
 # systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.gz
