@@ -168,7 +168,8 @@ arch-chroot /mnt grub-install --target=i386-pc $installDisk
 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 # Define senha padrão para root e cria usuarios
-arch-chroot /mnt useradd -m -g users -G wheel -p '' $installNewUser
+# arch-chroot /mnt useradd -m -g users -G wheel -p '' $installNewUser
+arch-chroot /mnt useradd -m -g users -G wheel $installNewUser
 
 # Copiando folder de instalação para o sistema novo
 cp /root/archdev /mnt/home/$installNewUser -r
