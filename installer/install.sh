@@ -34,7 +34,7 @@ packages=(
 # Pacotes compilados que serão instalados
 installAURPackages=(
   "polybar"
-  "i3lock-screen"
+  "i3lock-color"
   "betterlockscreen"
 )
 
