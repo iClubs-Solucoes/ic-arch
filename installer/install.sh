@@ -170,12 +170,13 @@ arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 # Define senha padrão para root e cria usuarios
 # arch-chroot /mnt useradd -m -g users -G wheel -p '' $installNewUser
 arch-chroot /mnt useradd -m -g users -G wheel $installNewUser
+arch-chroot /mnt passwd $installNewUser
 
 # Copiando folder de instalação para o sistema novo
 cp /root/archdev /mnt/home/$installNewUser -r
 
 # Removendo password pra comandos sudo para instalação
-cp /mnt/home/$installNewUser/arch/Config/Install\ sudo/* /mnt/etc/ -r
+cp /mnt/home/$installNewUser/archdev/Config/Install\ sudo/* /mnt/etc/ -r
 
 # Configuração basica de systema
 systemd-nspawn ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
@@ -189,16 +190,6 @@ systemd-nspawn echo '127.0.0.1  '$installHostName'.localdomain  localhost' >> /e
 
 # Conseguindo privilegios sudo
 echo 'Initializing Installation'
-
-# Criando pasta temporaria
-# mkdir /mnt/home/.installtemp
-
-# Copiando arquivos usados na instalação
-# cp /mnt/home/$installNewUser/archdevinstaller ~/.installtemp -r
-# cp /mnt/home/$installNewUser/archdevConfig ~/.installtemp -r
-# cp /mnt/home/$installNewUser/archdevLoginManager ~/.installtemp -r
-# cp /mnt/home/$installNewUser/archdevfonts ~/.installtemp -r
-# cp /mnt/home/$installNewUser/archdev/LookAndFeel ~/.installtemp -r
 
 # Instalando yay
 case $installYay in
