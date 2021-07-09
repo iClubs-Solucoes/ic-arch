@@ -17,6 +17,18 @@ packages=(
   "unzip"
   "neofetch"
   "grub"
+  # Pacotes para WM
+  "openbox"
+  "plank"
+  "lxappearance-obconf"
+  "lxinput"
+  "lxrandr"
+  "nitrogen"
+  "lxdm-gtk3"
+  "lxdm-gtk3"
+  "ttf-dejavu"
+  "noto-fonts"
+  "pcmanfm"
 )
 
 # Pacotes para instalação completa
@@ -39,100 +51,89 @@ packagesMinimum=(
   "xf86-video-intel"
 )
 
-# Pacotes para FWM (Openbox)
-packagesFWM=(
-  "openbox"
-  "plank"
-  "lxappearance-obconf"
-  "lxinput"
-  "lxrandr"
-  "nitrogen"
-  "lxdm-gtk3"
-  "lxdm-gtk3"
-  "ttf-dejavu"
-  "noto-fonts"
-  "pcmanfm"
-)
+installInfoCheck='n' 
 
-# Inicio do script de instalação
-echo '----------------------------------------------'
-echo '|           ARCH DARK INSTALLER              |'
-echo '----------------------------------------------'
+ # Inicio do script de instalação
+while [ $installInfoCheck != 'y' ]
+do
 
-echo ''
-echo 'Iniciando instalação ...'
-echo ''
+  clear
+  echo '----------------------------------------------'
+  echo '|            ARCH DEV INSTALLER              |'
+  echo '----------------------------------------------'
 
-# Seta o teclado para ABNT2
-loadkeys br-abnt2
+  echo ''
+  echo 'Iniciando instalação ...'
+  echo ''
 
-# Inicio de formulario para prosseguir com isntalação
-echo ''
-echo 'Você gostaria de realizar a instalação :'
-echo '1) Completa'
-echo '2) Minima'
-echo ''
-read -p '(padrão = 1): ' installType
-echo ''
+  # Seta o teclado para ABNT2
+  loadkeys br-abnt2
 
-case $installType in
-  2)
-    packages+=("${packagesMinimum[@]}")
-  ;;
-  *)
-    packages+=("${packagesComplete[@]}")
-  ;;
-esac
+  # Inicio de formulario para prosseguir com isntalação
+  echo ''
+  echo 'Você gostaria de realizar a instalação :'
+  echo '1) Completa'
+  echo '2) Minima'
+  echo ''
+  read -p '(padrão = 1): ' installType
 
-echo ''
-echo 'Sua interface grafica deve ser:'
-echo '1) Float Window Manager'
-echo '2) Tilling Window Manager'
-echo ''
-read -p '(padrão = 1): ' installUi
-echo ''
+  case $installType in
+    2)
+      packages+=("${packagesMinimum[@]}")
+    ;;
+    *)
+      packages+=("${packagesComplete[@]}")
+    ;;
+  esac
 
-case $installUi in
-  2)
-    # packages+=("${packagesMinimum[@]}")
-  ;;
-  *)
-    packages+=("${packagesFWM[@]}")
-  ;;
-esac
+  echo 'Você gostaria de instalar o assistente yay para pacotes AUR?'
+  read -p '(N,y): ' installYay
+  read -p 'Digite o nome de sua maquina: ' installHostName
+  read -p 'Digite o nome do seu usuário: ' installNewUser
 
-echo ''
-echo 'Você gostaria de instalar o assistente yay para pacotes AUR?'
-read -p '(N,y): ' installYay
-echo ''
+  fdisk -l
 
-echo ''
-read -p 'Digite o nome de sua maquina: ' installHostName
-echo ''
+  read -p 'Disco para formatar: ' installDisk
 
-echo ''
-read -p 'Digite o nome do seu usuário: ' installNewUser
-echo ''
+  read -p 'Tamanho da unidade de swap (coloque G ou MB após o numero): ' installDiskSwapSize
+  echo ''
 
-# while [ $installNewUserPass1 !== $installNewUserPass2 ]
-# do
-#   echo ''
-#   read -s -p 'Digite sua senha: ' installNewUserPass1
-#   read -s -p 'Repita sua senha: ' installNewUserPass2
-#   echo ''
-# done
+  if [ -z "$installDiskSwapSize" ]
+  then
+    installDiskSwapSize='5G'
+  fi
 
-fdisk -l
+  if [ "$installYay" != 'y' ]
+  then
+    installYay='n'
+  fi
 
-echo ''
-read -p 'Disco para formatar: ' installDisk
-echo ''
+  if [ $installType == '2' ]
+  then
+    installTypeLabel='Minima'
+  else
+    installTypeLabel='Completa'
+  fi
 
-installDiskSwapSize='5G'
+  clear
 
-echo ''
-read -p 'Tamanho da unidade de swap (coloque G ou MB após o numero): ' installDiskSwapSize
-echo ''
+  echo '----------------------------------------------'
+  echo '|            ARCH DEV INSTALLER              |'
+  echo '----------------------------------------------'
+
+  echo 'Resumo de Instalação'
+  echo ''
+  echo 'Tipo de instalação: '$installTypeLabel
+  echo 'Nome de Maquina: '$installHostName
+  echo 'Usuario: '$installNewUser
+  echo 'Instalar YAY: '$installYay
+  echo 'Formatar disco: '$installDisk
+  echo 'Tamanho de Swap: '$installDiskSwapSize
+  echo ''
+  echo 'Estas informações estão corretas?'
+  read -p '(N,y): ' installInfoCheck
+
+done
 
 # Particiona o disco
 parted $installDisk mklabel msdos 
@@ -168,9 +169,9 @@ arch-chroot /mnt grub-install --target=i386-pc $installDisk
 arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 # Define senha padrão para root e cria usuarios
-# arch-chroot /mnt useradd -m -g users -G wheel -p '' $installNewUser
-arch-chroot /mnt useradd -m -g users -G wheel $installNewUser
-arch-chroot /mnt passwd $installNewUser
+arch-chroot /mnt useradd -m -g users -G wheel -p '' $installNewUser
+# arch-chroot /mnt useradd -m -g users -G wheel $installNewUser
+# arch-chroot /mnt passwd $installNewUser
 
 # Copiando folder de instalação para o sistema novo
 cp /root/archdev /mnt/home/$installNewUser -r
@@ -229,7 +230,7 @@ cp /mnt/home/$installNewUser/archdev/LoginManager/Config/lxdm.conf /mnt/etc/lxdm
 cp /mnt/home/$installNewUser/archdev/LoginManager/Themes/* /mnt/usr/share/lxdm/themes/ArchDark -r
 
 # Instalando fontes
-# ~/.installtemp/installer/installfonts.sh
+cp -rf /mnt/home/$installNewUser/archdev/Fonts/* /mnt/usr/share/fonts
 
 # Removendo pasta temporaria
 # rm -rf ~/.installtemp
