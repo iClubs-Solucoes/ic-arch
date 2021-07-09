@@ -159,7 +159,7 @@ cd /mnt
 # Instalando pacotes
 for p in ${packages[@]}; do
   echo 'instalando '$p
-  read -p -t 10 'esperando interação ... ' interacao
+  read -p -t10 'esperando interação ... ' STOPPER
   systemd-nspawn pacman -S $p --noconfirm
 done
 
@@ -174,7 +174,7 @@ systemd-nspawn useradd -m -g users -G wheel -p '' $installNewUser
 cp /root/archdev /mnt/home/$installNewUser -r
 
 # Removendo password pra comandos sudo para instalação
-# cp /mnt/home/$installNewUser/arch/Config/Install\ sudo/* /mnt/etc/ -r
+cp /mnt/home/$installNewUser/arch/Config/Install\ sudo/* /mnt/etc/ -r
 
 # Configuração basica de systema
 systemd-nspawn ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
