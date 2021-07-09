@@ -31,6 +31,13 @@ packages=(
   "pcmanfm"
 )
 
+# Pacotes compilados que serão instalados
+installAURPackages=(
+  "polybar"
+  "i3lock-screen"
+  "betterlockscreen"
+)
+
 # Pacotes para instalação completa
 packagesComplete=(
   "xorg"
@@ -201,8 +208,9 @@ case $installYay in
 esac
 
 # Instalando aplicações complementares para open box
-systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/polybar.pkg.tar.zst --noconfirm
-systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/betterlockscreen.pkg.tar.zst --noconfirm
+for p in ${installAURPackages[@]}; do
+  systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/$p.pkg.tar.zst --noconfirm
+done
 
 # Habilitando interface gráfica
 systemd-nspawn systemctl enable NetworkManager.service
