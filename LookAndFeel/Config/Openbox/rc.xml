@@ -57,8 +57,8 @@
     <keepBorder>yes</keepBorder>
     <animateIconify>no</animateIconify>
     <font place="ActiveWindow">
-      <name>Noto Traditional Nushu</name>
-      <size>8</size>
+      <name>Liberation Sans</name>
+      <size>10</size>
       <!-- font size in points -->
       <weight>Normal</weight>
       <!-- 'bold' or 'normal' -->
@@ -66,8 +66,8 @@
       <!-- 'italic' or 'normal' -->
     </font>
     <font place="InactiveWindow">
-      <name>Noto Traditional Nushu</name>
-      <size>8</size>
+      <name>Liberation Sans</name>
+      <size>10</size>
       <!-- font size in points -->
       <weight>Normal</weight>
       <!-- 'bold' or 'normal' -->
@@ -75,8 +75,8 @@
       <!-- 'italic' or 'normal' -->
     </font>
     <font place="MenuHeader">
-      <name>Noto Traditional Nushu</name>
-      <size>9</size>
+      <name>Liberation Sans</name>
+      <size>10</size>
       <!-- font size in points -->
       <weight>Normal</weight>
       <!-- 'bold' or 'normal' -->
@@ -84,8 +84,8 @@
       <!-- 'italic' or 'normal' -->
     </font>
     <font place="MenuItem">
-      <name>Noto Traditional Nushu</name>
-      <size>9</size>
+      <name>Liberation Sans</name>
+      <size>10</size>
       <!-- font size in points -->
       <weight>Normal</weight>
       <!-- 'bold' or 'normal' -->
@@ -93,19 +93,19 @@
       <!-- 'italic' or 'normal' -->
     </font>
     <font place="ActiveOnScreenDisplay">
-      <name>Noto Traditional Nushu</name>
-      <size>9</size>
+      <name>Liberation Sans</name>
+      <size>11</size>
       <!-- font size in points -->
-      <weight>Bold</weight>
+      <weight>Normal</weight>
       <!-- 'bold' or 'normal' -->
       <slant>Normal</slant>
       <!-- 'italic' or 'normal' -->
     </font>
     <font place="InactiveOnScreenDisplay">
-      <name>Noto Traditional Nushu</name>
+      <name>Liberation Sans</name>
       <size>9</size>
       <!-- font size in points -->
-      <weight>Bold</weight>
+      <weight>Normal</weight>
       <!-- 'bold' or 'normal' -->
       <slant>Normal</slant>
       <!-- 'italic' or 'normal' -->
@@ -185,6 +185,24 @@
         <menu>client-menu</menu>
       </action>
     </keybind>
+    <keybind key="W-Left">
+      <action name="GrowToEdgeWest"/>
+    </keybind>
+    <keybind key="W-Right">
+      <action name="GrowToEdgeEast"/>
+    </keybind>
+    <keybind key="W-Up">
+      <action name="GrowToEdgeNorth"/>
+    </keybind>
+    <keybind key="W-Down">
+      <action name="GrowToEdgeSouth"/>
+    </keybind>
+    <keybind key="W-S">
+      <action name="ToggleMaximize"/>
+    </keybind>
+    <keybind key="W-q">
+      <action name="Iconify"/>
+    </keybind>
     <!-- Keybindings for window switching -->
     <keybind key="A-Tab">
       <action name="NextWindow">
@@ -244,9 +262,19 @@
         <command>code</command>
       </action>
     </keybind>
+    <keybind key="W-f">
+      <action name="Execute">
+        <command>firefox</command>
+      </action>
+    </keybind>
     <keybind key="W-m">
       <action name="Execute">
-        <command>rofi -no-config -no-lazy-grab -show drun -modi drun -theme /usr/share/doc/polybar/ArchDark/archdark/scripts/rofi/launcher.rasi</command>
+        <command>rofi -no-config -no-lazy-grab -show drun -modi drun -theme ~/.config/polybar/archdark/scripts/rofi/launcher.rasi</command>
+      </action>
+    </keybind>
+    <keybind key="W-Delete">
+      <action name="Execute">
+        <command>~/.config/polybar/archdark/scripts/powermenu.sh</command>
       </action>
     </keybind>
   </keyboard>
@@ -322,7 +350,7 @@
         <action name="Move"/>
       </mousebind>
       <mousebind button="Left" action="DoubleClick">
-        <action name="ToggleMaximize"/>
+        <action name="ToggleMaximizeFull"/>
       </mousebind>
       <mousebind button="Up" action="Click">
         <action name="if">
