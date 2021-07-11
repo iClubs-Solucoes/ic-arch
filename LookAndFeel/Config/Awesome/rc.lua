@@ -98,7 +98,8 @@ local themes = {
     "gtk"
 }
 
-local chosen_theme = themes[7]
+local chosen_theme = "ArchDark"
+-- local chosen_theme = themes[7]
 local modkey       = "Mod4"
 local altkey       = "Mod1"
 local terminal     = "alacritty"
@@ -172,7 +173,7 @@ awful.util.tasklist_buttons = mytable.join(
      awful.button({ }, 5, function() awful.client.focus.byidx(-1) end)
 )
 
-beautiful.init(string.format("%s/.config/awesome/themes/%s/theme.lua", os.getenv("HOME"), chosen_theme))
+beautiful.init(string.format("/usr/share/awesome/themes/%s/theme.lua", chosen_theme))
 
 -- }}}
 
