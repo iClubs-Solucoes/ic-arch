@@ -1,12 +1,14 @@
 # Inicio de variaveis
 # Pacotes basicos que serão instalados
 packages=(
+  "atom"
+  "nano"
   "sudo"
   "networkmanager"
+  "rofi"
   "htop"
   "alacritty"
-  "alsa-lib"
-  "alsa-utils"
+  "pulseaudio"
   "git"
   "firefox"
   "xarchiver"
@@ -15,19 +17,7 @@ packages=(
   "unzip"
   "neofetch"
   "grub"
-  # Pacotes para WM
-  "awesome"
-  "ranger"
-  "x-terminal-emulator"
-  "neovim"
 )
-
-# Pacotes compilados que serão instalados
-# installAURPackages=(
-#   "polybar"
-#   "i3lock-color"
-#   "betterlockscreen"
-# )
 
 # Pacotes para instalação completa
 packagesComplete=(
@@ -36,102 +26,113 @@ packagesComplete=(
 )
 
 # Pacotes para instalação minima
-# packagesMinimum=(
-#   "xorg-server"
-#   "binutils"
-#   "make"
-#   "gcc"
-#   "pkg-config"
-#   "go"
-#   "fakeroot"
-#   # Video drivers
-#   "mesa"
-#   "xf86-video-intel"
-# )
+packagesMinimum=(
+  "xorg-server"
+  "binutils"
+  "make"
+  "gcc"
+  "pkg-config"
+  "go"
+  "fakeroot"
+  # Video drivers
+  "mesa"
+  "xf86-video-intel"
+)
 
-installInfoCheck='n' 
+# Pacotes para FWM (Openbox)
+packagesFWM=(
+  "openbox"
+  "plank"
+  "lxappearance-obconf"
+  "lxinput"
+  "lxrandr"
+  "nitrogen"
+  "lxdm-gtk3"
+  "lxdm-gtk3"
+  "ttf-dejavu"
+  "noto-fonts"
+  "pcmanfm"
+)
 
- # Inicio do script de instalação
-while [ $installInfoCheck != 'y' ]
-do
+# Inicio do script de instalação
+echo '----------------------------------------------'
+echo '|           ARCH DARK INSTALLER              |'
+echo '----------------------------------------------'
 
-  clear
-  echo '----------------------------------------------'
-  echo '|            ARCH DEV INSTALLER              |'
-  echo '----------------------------------------------'
+echo ''
+echo 'Iniciando instalação ...'
+echo ''
 
-  echo ''
-  echo 'Iniciando instalação ...'
-  echo ''
+# Seta o teclado para ABNT2
+loadkeys br-abnt2
 
-  # Seta o teclado para ABNT2
-  loadkeys br-abnt2
+# Inicio de formulario para prosseguir com isntalação
+echo ''
+echo 'Você gostaria de realizar a instalação :'
+echo '1) Completa'
+echo '2) Minima'
+echo ''
+read -p '(padrão = 1): ' installType
+echo ''
 
-  # Inicio de formulario para prosseguir com isntalação
-  echo ''
-  echo 'Você gostaria de realizar a instalação :'
-  echo '1) Completa'
-  echo '2) Minima'
-  echo ''
-  read -p '(padrão = 1): ' installType
+case $installType in
+  2)
+    packages+=("${packagesMinimum[@]}")
+  ;;
+  *)
+    packages+=("${packagesComplete[@]}")
+  ;;
+esac
 
-  case $installType in
-    2)
-      packages+=("${packagesMinimum[@]}")
-    ;;
-    *)
-      packages+=("${packagesComplete[@]}")
-    ;;
-  esac
+echo ''
+echo 'Sua interface grafica deve ser:'
+echo '1) Float Window Manager'
+echo '2) Tilling Window Manager'
+echo ''
+read -p '(padrão = 1): ' installUi
+echo ''
 
-  echo 'Você gostaria de instalar o assistente yay para pacotes AUR?'
-  read -p '(N,y): ' installYay
-  read -p 'Digite o nome de sua maquina: ' installHostName
-  read -p 'Digite o nome do seu usuário: ' installNewUser
+case $installUi in
+  2)
+    # packages+=("${packagesMinimum[@]}")
+  ;;
+  *)
+    packages+=("${packagesFWM[@]}")
+  ;;
+esac
 
-  fdisk -l
+echo ''
+echo 'Você gostaria de instalar o assistente yay para pacotes AUR?'
+read -p '(N,y): ' installYay
+echo ''
 
-  read -p 'Disco para formatar: ' installDisk
+echo ''
+read -p 'Digite o nome de sua maquina: ' installHostName
+echo ''
 
-  read -p 'Tamanho da unidade de swap (coloque G ou MB após o numero): ' installDiskSwapSize
-  echo ''
+echo ''
+read -p 'Digite o nome do seu usuário: ' installNewUser
+echo ''
 
-  if [ -z "$installDiskSwapSize" ]
-  then
-    installDiskSwapSize='5G'
-  fi
+# while [ $installNewUserPass1 !== $installNewUserPass2 ]
+# do
+#   echo ''
+#   read -s -p 'Digite sua senha: ' installNewUserPass1
+#   read -s -p 'Repita sua senha: ' installNewUserPass2
+#   echo ''
+# done
 
-  if [ "$installYay" != 'y' ]
-  then
-    installYay='n'
-  fi
+fdisk -l
 
-  if [ $installType == '2' ]
-  then
-    installTypeLabel='Minima'
-  else
-    installTypeLabel='Completa'
-  fi
+echo ''
+read -p 'Disco para formatar: ' installDisk
+echo ''
 
-  clear
+installDiskSwapSize='5G'
 
-  echo '----------------------------------------------'
-  echo '|            ARCH DEV INSTALLER              |'
-  echo '----------------------------------------------'
-
-  echo 'Resumo de Instalação'
-  echo ''
-  echo 'Tipo de instalação: '$installTypeLabel
-  echo 'Nome de Maquina: '$installHostName
-  echo 'Usuario: '$installNewUser
-  echo 'Instalar YAY: '$installYay
-  echo 'Formatar disco: '$installDisk
-  echo 'Tamanho de Swap: '$installDiskSwapSize
-  echo ''
-  echo 'Estas informações estão corretas?'
-  read -p '(N,y): ' installInfoCheck
-
-done
+echo ''
+read -p 'Tamanho da unidade de swap (coloque G ou MB após o numero): ' installDiskSwapSize
+echo ''
 
 # Particiona o disco
 parted $installDisk mklabel msdos 
@@ -158,7 +159,7 @@ cd /mnt
 # Instalando pacotes
 for p in ${packages[@]}; do
   echo 'instalando '$p
-  read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
+  read -t 10 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
   systemd-nspawn pacman -S $p --noconfirm
 done
 
@@ -168,6 +169,8 @@ arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 # Define senha padrão para root e cria usuarios
 arch-chroot /mnt useradd -m -g users -G wheel -p '' $installNewUser
+# arch-chroot /mnt useradd -m -g users -G wheel $installNewUser
+# arch-chroot /mnt passwd $installNewUser
 
 # Copiando folder de instalação para o sistema novo
 cp /root/archdev /mnt/home/$installNewUser -r
@@ -191,7 +194,7 @@ echo 'Initializing Installation'
 # Instalando yay
 case $installYay in
   y)
-    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.zst --noconfirm
+    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.zst
   ;;
   *)
 
@@ -199,9 +202,15 @@ case $installYay in
 esac
 
 # Instalando aplicações complementares para open box
-for p in ${installAURPackages[@]}; do
-  systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/$p.pkg.tar.zst --noconfirm
-done
+case $installUi in
+  2)
+
+  ;;
+  *)
+    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/polybar.pkg.tar.zst
+  ;;
+esac
+# systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.gz
 
 # Habilitando interface gráfica
 systemd-nspawn systemctl enable NetworkManager.service
@@ -220,19 +229,18 @@ cp /mnt/home/$installNewUser/archdev/LoginManager/Config/lxdm.conf /mnt/etc/lxdm
 cp /mnt/home/$installNewUser/archdev/LoginManager/Themes/* /mnt/usr/share/lxdm/themes/ArchDark -r
 
 # Instalando fontes
-cp -rf /mnt/home/$installNewUser/archdev/Fonts/* /mnt/usr/share/fonts
+# ~/.installtemp/installer/installfonts.sh
+
+# Removendo pasta temporaria
+# rm -rf ~/.installtemp
 
 # Mostrando neofetch para mostrar o fim do processo
-clear
-echo '----------------------------------------------'
-echo '|            ARCH DEV INSTALLER              |'
-echo '----------------------------------------------'
-echo 'Instalação finalizada'
+# clear
 arch-chroot /mnt neofetch
-read -p 'press any key to continue.....' STOPPER
+# read -p 'press any key to continue.....' stoper
 
 # Rebootando
-reboot
+# reboot
 
 ## Infos Extras
 # Para compilar pacotes AUR é necessario usar o comando extra-x86_64-build, esse comando ira gerar um instalaverl .pkg.tar.gz
