@@ -20,12 +20,12 @@ packages=(
   "ranger"
 )
 
-# Pacotes compilados que serão instalados
-# installAURPackages=(
-#   "polybar"
-#   "i3lock-color"
-#   "betterlockscreen"
-# )
+Pacotes compilados que serão instalados
+installAURPackages=(
+  "lain-git"
+  "awesome-freedesktop-git"
+  "betterlockscreen"
+)
 
 # Pacotes para instalação completa
 packagesComplete=(
@@ -134,7 +134,7 @@ done
 # Particiona o disco
 parted $installDisk mklabel msdos 
 ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
-echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
+echo i | parted -a opt $installDisk mkpart primary linux-swap 256M $installDiskSwapSize
 echo i | parted -a opt $installDisk mkpart primary ext4 $installDiskSwapSize 100%
 parted -a opt $installDisk set 2 boot on
 
@@ -207,12 +207,14 @@ systemd-nspawn systemctl enable lxdm.service
 
 # Configurando interface gráfica
 # cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/awesome/themes/ArchDark -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/awesome/themes/ArchDark -r
 # cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Openbox/ /mnt/usr/share/themes/ArchDark -r
 # cp /mnt/home/$installNewUser/archdev/LookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK2/gtkrc /mnt/usr/share/gtk-2.0/gtkrc -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK3/settings.ini /mnt/usr/share/gtk-3.0/settings.ini -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/Icons/index.theme /mnt/usr/share/icons/default/index.theme -r
 # cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Awesome/* /mnt/etc/xdg/awesome/ -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Awesome/* /mnt/etc/xdg/awesome/ -r
 # cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Openbox/* /mnt/etc/xdg/openbox/ -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Plank/Theme/* /mnt/usr/share/plank/themes/Default/ -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Polybar/Theme/ /mnt/usr/share/doc/polybar/ArchDark/ -r

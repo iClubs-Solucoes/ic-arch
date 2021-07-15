@@ -84,20 +84,6 @@ awful.spawn.with_shell(
 
 -- {{{ Variable definitions
 
-local themes = {
-    "blackburn",       -- 1
-    "copland",         -- 2
-    "dremora",         -- 3
-    "holo",            -- 4
-    "multicolor",      -- 5
-    "powerarrow",      -- 6
-    "powerarrow-dark", -- 7
-    "rainbow",         -- 8
-    "steamburn",       -- 9
-    "vertex",           -- 10
-    "gtk"
-}
-
 local chosen_theme = "ArchDark"
 -- local chosen_theme = themes[7]
 local modkey       = "Mod4"
@@ -265,7 +251,7 @@ globalkeys = mytable.join(
         --   {description = "lock screen", group = "hotkeys"}),
     
     -- -- Power config 
-    awful.key({ modkey }, "Delete", function () os.execute("~/.config/awesome/rofi/powermenu.sh") end,
+    awful.key({ modkey }, "Delete", function () os.execute("/usr/share/awesome/ArchDark/rofi/powermenu.sh") end,
       {description = "power menu", group = "awesome"}),
     
     -- -- -- Block Screen
@@ -531,7 +517,7 @@ globalkeys = mytable.join(
               {description = "run browser", group = "launcher"}),
 
     awful.key({ modkey }, "m", function ()
-                os.execute(string.format("rofi -no-config -no-lazy-grab -show drun -modi drun -theme ~/.config/polybar/archdark/scripts/rofi/launcher.rasi",
+                os.execute(string.format("rofi -no-config -no-lazy-grab -show drun -modi drun -theme /usr/share/awesome/ArchDark/rofi/rofi/launcher.rasi",
                 'run', 'dmenu'))
             end,
             {description = "show rofi", group = "hotkeys"}),

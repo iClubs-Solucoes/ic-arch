@@ -10,4 +10,4 @@ FILE="$HOME/.config/polybar/archdark/scripts/rofi/colors.rasi"
 #sed -i -e "s/ac: .*/ac:   ${AC}FF;/g" $FILE
 #sed -i -e "s/se: .*/se:   ${SE}FF;/g" $FILE
 
-rofi -no-config -no-lazy-grab -show drun -modi drun -theme ~/.config/polybar/archdark/scripts/rofi/launcher.rasi
+rofi -no-config -no-lazy-grab -show drun -modi drun -theme /usr/share/awesome/ArchDark/rofi/rofi/launcher.rasi
