@@ -145,7 +145,8 @@ done
 # Particiona o disco
 parted $installDisk mklabel msdos 
 ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
-echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
+## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
+echo i | parted -a opt $installDisk mkpart primary linux-swap 256M $installDiskSwapSize
 echo i | parted -a opt $installDisk mkpart primary ext4 $installDiskSwapSize 100%
 parted -a opt $installDisk set 2 boot on
 
