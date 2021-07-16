@@ -23,9 +23,18 @@ yayInstalled(){
   done
 }
 
-# yayNotInstalled(){
-
-# }
+yayNotInstalled(){
+  sudo pacman -Sy
+  installPakages
+  cd ~/
+  for aur in ${packagesDevEnvAUR[@]}; do
+    git clone https://aur.archlinux.org/$aur
+    cd $aur
+    makepkg -S
+    sudo makepkg -i
+    cd ~/
+  done
+}
 
 read -p 'YAY esta instalado?(N,y): ' isYayInstalled
 case $isYayInstalled in
@@ -33,6 +42,6 @@ case $isYayInstalled in
     yayInstalled
   ;;
   *)
-
+    yayNotInstalled
   ;;
 esac
