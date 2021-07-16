@@ -157,8 +157,8 @@ cd /mnt
 
 # Instalando pacotes
 for p in ${packages[@]}; do
-  echo 'instalando '$p
-  read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
+  # echo 'instalando '$p
+  # read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
   systemd-nspawn pacman -S $p --noconfirm
 done
 
