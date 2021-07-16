@@ -17,6 +17,7 @@ packages=(
   "grub"
   "lxdm-gtk3"
   "awesome"
+  "rofi"
   "ranger"
 )
 
@@ -24,6 +25,7 @@ Pacotes compilados que serão instalados
 installAURPackages=(
   "lain-git"
   "awesome-freedesktop-git"
+  "i3lock-color"
   "betterlockscreen"
 )
 
@@ -209,7 +211,7 @@ systemd-nspawn systemctl enable lxdm.service
 # cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/awesome/themes/ArchDark -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/awesome/themes/ArchDark -r
 # cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Openbox/ /mnt/usr/share/themes/ArchDark -r
-# cp /mnt/home/$installNewUser/archdev/LookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK2/gtkrc /mnt/usr/share/gtk-2.0/gtkrc -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK3/settings.ini /mnt/usr/share/gtk-3.0/settings.ini -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/Icons/index.theme /mnt/usr/share/icons/default/index.theme -r
