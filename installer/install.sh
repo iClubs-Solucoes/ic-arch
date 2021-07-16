@@ -245,15 +245,15 @@ cp /root/archdev /mnt/home/$installNewUser -r
 cp /mnt/home/$installNewUser/archdev/Config/Install\ sudo/* /mnt/etc/ -r
 
 # Configuração basica de systema
-systemd-nspawn ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
-systemd-nspawn echo 'pt_BR.UTF-8 UTF-8' >> /etc/locale.gen
-systemd-nspawn locale-gen
-systemd-nspawn echo 'KEYMAP=br-abnt2' >> /etc/vconsole.conf
-systemd-nspawn echo $installHostName >> /etc/hostname
-systemd-nspawn echo '127.0.0.1  localhost' >> /etc/hosts
-systemd-nspawn echo '::1  localhost' >> /etc/hosts
-systemd-nspawn echo '127.0.0.1  '$installHostName'.localdomain  localhost' >> /etc/hosts
-systemd-nspawn echo 'eval "$(starship init bash)"' >> /etc/bash.bashrc
+ln -sf /mnt/usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+echo 'pt_BR.UTF-8 UTF-8' >> /mnt/etc/locale.gen
+arch-chroot /mnt locale-gen
+echo 'KEYMAP=br-abnt2' >> /mnt/etc/vconsole.conf
+echo $installHostName >> /mnt/etc/hostname
+echo '127.0.0.1  localhost' >> /mnt/etc/hosts
+echo '::1  localhost' >> /mnt/etc/hosts
+echo '127.0.0.1  '$installHostName'.localdomain  localhost' >> /mnt/etc/hosts
+echo 'eval "$(starship init bash)"' >> /mnt/etc/bash.bashrc
 
 # Conseguindo privilegios sudo
 echo 'Initializing Installation'
