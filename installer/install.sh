@@ -253,7 +253,7 @@ systemd-nspawn echo $installHostName >> /etc/hostname
 systemd-nspawn echo '127.0.0.1  localhost' >> /etc/hosts
 systemd-nspawn echo '::1  localhost' >> /etc/hosts
 systemd-nspawn echo '127.0.0.1  '$installHostName'.localdomain  localhost' >> /etc/hosts
-systemd-nspawn echo 'esac "$(starship init bash)"' >> /etc/bash.bashrc
+systemd-nspawn echo 'eval "$(starship init bash)"' >> /etc/bash.bashrc
 
 # Conseguindo privilegios sudo
 echo 'Initializing Installation'
