@@ -13,6 +13,7 @@ packages=(
   "zip"
   "unzip"
   "neofetch"
+  "lxdm-gtk3"
   "grub"
 )
 
@@ -27,7 +28,6 @@ installPackagesFWM=(
   "lxinput"
   "lxrandr"
   "nitrogen"
-  "lxdm-gtk3"
   "ttf-dejavu"
   "noto-fonts"
   "pcmanfm"
@@ -212,8 +212,8 @@ cd /mnt
 
 # Instalando pacotes
 for p in ${packages[@]}; do
-  echo 'instalando '$p
-  read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
+  # echo 'instalando '$p
+  # read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
   systemd-nspawn pacman -S $p --noconfirm
 done
 
