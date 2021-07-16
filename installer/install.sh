@@ -13,6 +13,8 @@ packages=(
   "zip"
   "unzip"
   "neofetch"
+  "ttf-dejavu"
+  "noto-fonts"
   "lxdm-gtk3"
   "grub"
 )
@@ -28,14 +30,14 @@ installPackagesFWM=(
   "lxinput"
   "lxrandr"
   "nitrogen"
-  "ttf-dejavu"
-  "noto-fonts"
   "pcmanfm"
 )
 
 # Pacotes para TWM
 installPackagesTWM=(
   "nano"
+  "alsa-lib"
+  "alsa-utils"
   "awesome"
   "rofi"
   "ranger"
@@ -166,6 +168,15 @@ do
   echo ''
   echo 'Estas informações estão corretas?'
   read -p '(N,y): ' installInfoCheck
+
+  case $installInfoCheck in
+    y)
+
+    ;;
+    *)
+      installInfoCheck='n'
+    ;;
+  esac
 
 done
 
