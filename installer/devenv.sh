@@ -29,9 +29,6 @@ installPakages(){
 yayInstalled(){
   sudo pacman -Sy
   installPakages
-  for dep in ${packagesDevEnvAURDependencies[@]}; do
-    yay -S $dep --noconfirm
-  done
   for aur in ${packagesDevEnvAUR[@]}; do
     yay -S $aur --noconfirm
   done
@@ -40,6 +37,9 @@ yayInstalled(){
 yayNotInstalled(){
   sudo pacman -Sy
   installPakages
+  for dep in ${packagesDevEnvAURDependencies[@]}; do
+    yay -S $dep --noconfirm
+  done
   cd ~/
   for aur in ${packagesDevEnvAUR[@]}; do
     git clone https://aur.archlinux.org/$aur
