@@ -22,9 +22,9 @@ yayInstalled(){
   done
 }
 
-yayNotInstalled(){
+# yayNotInstalled(){
 
-}
+# }
 
 read -p 'YAY esta instalado?(N,y): ' isYayInstalled
 case $isYayInstalled in
