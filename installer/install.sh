@@ -53,7 +53,7 @@ installAURFWM=(
 )
 
 # Pacotes compilados que serão instalados com TWM
-installAURFWM=(
+installAURTWM=(
   "lain-git"
   "awesome-freedesktop-git"
 )
@@ -172,9 +172,11 @@ done
 case $installWindowManager in
   2)
     packages+=("${installPackagesTWM[@]}")
+    installAURPackages+=("${installAURTWM[@]}")
   ;;
   *)
     packages+=("${installPackagesFWM[@]}")
+    installAURPackages+=("${installAURFWM[@]}")
   ;;
 esac
 
@@ -269,17 +271,18 @@ cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK3/settings.ini
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/Icons/index.theme /mnt/usr/share/icons/default/index.theme -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Plank/Theme/* /mnt/usr/share/plank/themes/Default/ -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Polybar/Theme/ /mnt/usr/share/doc/polybar/ArchDark/ -r
-cp /mnt/home/$installNewUser/archdev/LoginManager/Config/lxdm.conf /mnt/etc/lxdm/
 cp /mnt/home/$installNewUser/archdev/LoginManager/Themes/* /mnt/usr/share/lxdm/themes/ArchDark -r
 
 case $installWindowManager in
   2)
     cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/themes/ArchDark -r
     cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Awesome/* /mnt/etc/xdg/awesome/ -r
+    cp /mnt/home/$installNewUser/archdev/LoginManager/Config/Awesome/lxdm.conf /mnt/etc/lxdm/
   ;;
   *)
     cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Openbox/ /mnt/usr/share/themes/ArchDark -r
     cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Openbox/* /mnt/etc/xdg/openbox/ -r
+    cp /mnt/home/$installNewUser/archdev/LoginManager/Config/Openbox/lxdm.conf /mnt/etc/lxdm/
   ;;
 esac
 
