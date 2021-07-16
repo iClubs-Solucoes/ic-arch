@@ -1,14 +1,11 @@
 # Inicio de variaveis
 # Pacotes basicos que serão instalados
 packages=(
-  "atom"
-  "nano"
   "sudo"
   "networkmanager"
   "rofi"
   "htop"
   "alacritty"
-  "pulseaudio"
   "git"
   "firefox"
   "xarchiver"
@@ -17,7 +14,13 @@ packages=(
   "unzip"
   "neofetch"
   "grub"
-  # Pacotes para WM
+)
+
+# Pacotes para FWM
+installPackagesFWM=(
+  "nano"
+  "pulseaudio"
+  "atom"
   "openbox"
   "plank"
   "lxappearance-obconf"
@@ -25,17 +28,34 @@ packages=(
   "lxrandr"
   "nitrogen"
   "lxdm-gtk3"
-  "lxdm-gtk3"
   "ttf-dejavu"
   "noto-fonts"
   "pcmanfm"
 )
 
+# Pacotes para TWM
+installPackagesTWM=(
+  "nano"
+  "awesome"
+  "rofi"
+  "ranger"
+)
+
 # Pacotes compilados que serão instalados
 installAURPackages=(
-  "polybar"
   "i3lock-color"
   "betterlockscreen"
+)
+
+# Pacotes compilados que serão instalados com FWM
+installAURFWM=(
+  "polybar"
+)
+
+# Pacotes compilados que serão instalados com TWM
+installAURFWM=(
+  "lain-git"
+  "awesome-freedesktop-git"
 )
 
 # Pacotes para instalação completa
@@ -76,7 +96,7 @@ do
   # Seta o teclado para ABNT2
   loadkeys br-abnt2
 
-  # Inicio de formulario para prosseguir com isntalação
+  # Inicio de formulario para prosseguir com instalação
   echo ''
   echo 'Você gostaria de realizar a instalação :'
   echo '1) Completa'
@@ -84,14 +104,13 @@ do
   echo ''
   read -p '(padrão = 1): ' installType
 
-  case $installType in
-    2)
-      packages+=("${packagesMinimum[@]}")
-    ;;
-    *)
-      packages+=("${packagesComplete[@]}")
-    ;;
-  esac
+  # Formulario para prosseguir com a instação do window manager
+  echo ''
+  echo 'Escolha o ambiente:'
+  echo '1) Floating Window Manager'
+  echo '2) Tiling Window Manager'
+  echo ''
+  read -p '(padrão = 1): ' installWindowManager
 
   echo 'Você gostaria de instalar o assistente yay para pacotes AUR?'
   read -p '(N,y): ' installYay
@@ -122,6 +141,13 @@ do
     installTypeLabel='Completa'
   fi
 
+  if [ $installWindowManager == '2' ]
+  then
+    installWindowManagerLabel='Tiling Window Manager'
+  else
+    installWindowManagerLabel='Floating Window Manager'
+  fi
+
   clear
 
   echo '----------------------------------------------'
@@ -130,17 +156,36 @@ do
 
   echo 'Resumo de Instalação'
   echo ''
-  echo 'Tipo de instalação: '$installTypeLabel
+  echo 'Tipo de Instalação: '$installTypeLabel
+  echo 'Window Manager: '$installWindowManagerLabel
   echo 'Nome de Maquina: '$installHostName
   echo 'Usuario: '$installNewUser
   echo 'Instalar YAY: '$installYay
-  echo 'Formatar disco: '$installDisk
+  echo 'Formatar Disco: '$installDisk
   echo 'Tamanho de Swap: '$installDiskSwapSize
   echo ''
   echo 'Estas informações estão corretas?'
   read -p '(N,y): ' installInfoCheck
 
 done
+
+case $installWindowManager in
+  2)
+    packages+=("${installPackagesTWM[@]}")
+  ;;
+  *)
+    packages+=("${installPackagesFWM[@]}")
+  ;;
+esac
+
+case $installType in
+  2)
+    packages+=("${packagesMinimum[@]}")
+  ;;
+  *)
+    packages+=("${packagesComplete[@]}")
+  ;;
+esac
 
 # Particiona o disco
 parted $installDisk mklabel msdos 
@@ -218,16 +263,25 @@ systemd-nspawn systemctl enable NetworkManager.service
 systemd-nspawn systemctl enable lxdm.service
 
 # Configurando interface gráfica
-cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/ /mnt/usr/share/themes/ArchDark -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK2/gtkrc /mnt/usr/share/gtk-2.0/gtkrc -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK3/settings.ini /mnt/usr/share/gtk-3.0/settings.ini -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/Icons/index.theme /mnt/usr/share/icons/default/index.theme -r
-cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Openbox/* /mnt/etc/xdg/openbox/ -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Plank/Theme/* /mnt/usr/share/plank/themes/Default/ -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Polybar/Theme/ /mnt/usr/share/doc/polybar/ArchDark/ -r
 cp /mnt/home/$installNewUser/archdev/LoginManager/Config/lxdm.conf /mnt/etc/lxdm/
 cp /mnt/home/$installNewUser/archdev/LoginManager/Themes/* /mnt/usr/share/lxdm/themes/ArchDark -r
+
+case $installWindowManager in
+  2)
+    cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/themes/ArchDark -r
+    cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Awesome/* /mnt/etc/xdg/awesome/ -r
+  ;;
+  *)
+    cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Openbox/ /mnt/usr/share/themes/ArchDark -r
+    cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Openbox/* /mnt/etc/xdg/openbox/ -r
+  ;;
+esac
 
 # Instalando fontes
 cp -rf /mnt/home/$installNewUser/archdev/Fonts/* /mnt/usr/share/fonts
