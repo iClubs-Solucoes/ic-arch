@@ -5,7 +5,7 @@
 ## Github  : @adi1090x
 ## Twitter : @adi1090x
 
-dir="/usr/share/awesome/themes/ArchDark/rofi/rofi"
+dir="/usr/share/themes/ArchDark/rofi/rofi"
 uptime=$(uptime -p | sed -e 's/up //g')
 
 rofi_command="rofi -theme $dir/powermenu.rasi"

@@ -16,7 +16,7 @@ local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
 
 local theme                                     = {}
 -- theme.dir                                       = os.getenv("HOME") .. "/.config/awesome/themes/powerarrow-dark"
-theme.dir                                       = "/usr/share/awesome/themes/ArchDark"
+theme.dir                                       = "/usr/share/themes/ArchDark"
 --theme.wallpaper                                 = theme.dir .. "/wall.png"
 theme.wallpaper                                 = "/usr/share/lxdm/themes/ArchDark/background.png"
 theme.font                                      = "DejaVu 8"

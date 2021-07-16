@@ -209,7 +209,7 @@ systemd-nspawn systemctl enable lxdm.service
 
 # Configurando interface gráfica
 # cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/awesome/themes/ArchDark -r
-cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/awesome/themes/ArchDark -r
+cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/themes/ArchDark -r
 # cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Openbox/ /mnt/usr/share/themes/ArchDark -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK2/gtkrc /mnt/usr/share/gtk-2.0/gtkrc -r

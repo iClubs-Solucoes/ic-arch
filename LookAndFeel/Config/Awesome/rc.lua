@@ -159,7 +159,7 @@ awful.util.tasklist_buttons = mytable.join(
      awful.button({ }, 5, function() awful.client.focus.byidx(-1) end)
 )
 
-beautiful.init(string.format("/usr/share/awesome/themes/%s/theme.lua", chosen_theme))
+beautiful.init(string.format("/usr/share/themes/%s/theme.lua", chosen_theme))
 
 -- }}}
 
@@ -251,7 +251,7 @@ globalkeys = mytable.join(
         --   {description = "lock screen", group = "hotkeys"}),
     
     -- -- Power config 
-    awful.key({ modkey }, "Delete", function () os.execute("/usr/share/awesome/themes/ArchDark/rofi/powermenu.sh") end,
+    awful.key({ modkey }, "Delete", function () os.execute("/usr/share/themes/ArchDark/rofi/powermenu.sh") end,
       {description = "power menu", group = "awesome"}),
     
     -- -- -- Block Screen
@@ -517,7 +517,7 @@ globalkeys = mytable.join(
               {description = "run browser", group = "launcher"}),
 
     awful.key({ modkey }, "m", function ()
-                os.execute(string.format("rofi -no-config -no-lazy-grab -show drun -modi drun -theme /usr/share/awesome/themes/ArchDark/rofi/rofi/launcher.rasi",
+                os.execute(string.format("rofi -no-config -no-lazy-grab -show drun -modi drun -theme /usr/share/themes/ArchDark/rofi/rofi/launcher.rasi",
                 'run', 'dmenu'))
             end,
             {description = "show rofi", group = "hotkeys"}),
