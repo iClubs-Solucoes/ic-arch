@@ -4,8 +4,11 @@ packagesDevEnvAUR=(
   "beekeeper-studio-bin"
 )
 
-packagesDevEnvAURDependencies=(
+packagesDevEnvAURDependenciesAUR=(
   "nvm"
+)
+
+packagesDevEnvAURDependencies=(
   "lsof"
   "libxss"
   "libnotify"
@@ -41,11 +44,18 @@ yayNotInstalled(){
     sudo pacman -S $dep --noconfirm
   done
   cd ~/
+  for depaur in ${packagesDevEnvAURDependenciesAUR[@]}; do
+    git clone https://aur.archlinux.org/$depaur
+    cd $depaur
+    makepkg -S
+    makepkg -i --noconfirm
+    cd ~/
+  done
   for aur in ${packagesDevEnvAUR[@]}; do
     git clone https://aur.archlinux.org/$aur
     cd $aur
     makepkg -S
-    makepkg -i
+    makepkg -i --noconfirm
     cd ~/
   done
 }
