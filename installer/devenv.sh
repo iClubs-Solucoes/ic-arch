@@ -38,7 +38,7 @@ yayNotInstalled(){
   sudo pacman -Sy
   installPakages
   for dep in ${packagesDevEnvAURDependencies[@]}; do
-    yay -S $dep --noconfirm
+    sudo pacman -S $dep --noconfirm
   done
   cd ~/
   for aur in ${packagesDevEnvAUR[@]}; do
