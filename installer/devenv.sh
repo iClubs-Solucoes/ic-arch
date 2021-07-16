@@ -11,11 +11,12 @@ packagesDevEnv=(
 
 installPakages(){
   for p in ${packagesDevEnv[@]}; do
-    pacman -S $p --noconfirm
+    sudo pacman -S $p --noconfirm
   done
 }
 
 yayInstalled(){
+  sudo pacman -Sy
   installPakages
   for aur in ${packagesDevEnvAUR[@]}; do
     yay -S $aur --noconfirm
