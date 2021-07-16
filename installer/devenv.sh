@@ -4,8 +4,19 @@ packagesDevEnvAUR=(
   "beekeeper-studio-bin"
 )
 
+packagesDevEnvAURDependencies=(
+  "nvm"
+  "lsof"
+  "libxss"
+  "libnotify"
+  "xdg-utils"
+  "libxslt"
+  "libappindicator-gtk3"
+)
+
 packagesDevEnv=(
   "nodejs"
+  "npm"
   "python"
 )
 
@@ -18,6 +29,9 @@ installPakages(){
 yayInstalled(){
   sudo pacman -Sy
   installPakages
+  for dep in ${packagesDevEnvAURDependencies[@]}; do
+    yay -S $dep --noconfirm
+  done
   for aur in ${packagesDevEnvAUR[@]}; do
     yay -S $aur --noconfirm
   done
