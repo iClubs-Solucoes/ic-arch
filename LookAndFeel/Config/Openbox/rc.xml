@@ -269,12 +269,12 @@
     </keybind>
     <keybind key="W-m">
       <action name="Execute">
-        <command>rofi -no-config -no-lazy-grab -show drun -modi drun -theme ~/.config/polybar/archdark/scripts/rofi/launcher.rasi</command>
+        <command>rofi -no-config -no-lazy-grab -show drun -modi drun -theme /usr/share/themes/ArchDark/rofi/rofi/launcher.rasi</command>
       </action>
     </keybind>
     <keybind key="W-Delete">
       <action name="Execute">
-        <command>~/.config/polybar/archdark/scripts/powermenu.sh</command>
+        <command>/usr/share/themes/ArchDark/rofi/powermenu.sh</command>
       </action>
     </keybind>
   </keyboard>
