@@ -23,6 +23,16 @@ packagesDevEnv=(
   "python"
 )
 
+packagesNode=(
+  "yarn"
+)
+
+installNodePackages(){
+  for n in ${packagesNode[@]}; do
+    sudo npm i -g $n
+  done
+}
+
 installPakages(){
   for p in ${packagesDevEnv[@]}; do
     sudo pacman -S $p --noconfirm
@@ -35,6 +45,7 @@ yayInstalled(){
   for aur in ${packagesDevEnvAUR[@]}; do
     yay -S $aur --noconfirm
   done
+  installNodePackages
 }
 
 yayNotInstalled(){
@@ -58,6 +69,7 @@ yayNotInstalled(){
     makepkg -i --noconfirm
     cd ~/
   done
+  installNodePackages
 }
 
 read -p 'YAY esta instalado?(N,y): ' isYayInstalled
@@ -69,3 +81,6 @@ case $isYayInstalled in
     yayNotInstalled
   ;;
 esac
+
+echo 'Redefina sua senha: '
+passwd
