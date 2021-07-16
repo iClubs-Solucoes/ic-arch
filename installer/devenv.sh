@@ -31,7 +31,7 @@ yayNotInstalled(){
     git clone https://aur.archlinux.org/$aur
     cd $aur
     makepkg -S
-    sudo makepkg -i
+    makepkg -i
     cd ~/
   done
 }

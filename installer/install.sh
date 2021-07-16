@@ -276,6 +276,8 @@ done
 # Habilitando interface gráfica
 systemd-nspawn systemctl enable NetworkManager.service
 systemd-nspawn systemctl enable lxdm.service
+systemd-nspawn systemctl enable --now systemd-timesyncd.service
+systemd-nspawn systemctl enable --now systemd-time-await-sync.service
 
 # Configurando interface gráfica
 cp /mnt/home/$installNewUser/archdev/LookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
