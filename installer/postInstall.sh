@@ -27,6 +27,11 @@ packagesNode=(
   "yarn"
 )
 
+packagesNodeFrontEnd=(
+  "@vue/cli"
+  "create-react-app"
+)
+
 installNodePackages(){
   for n in ${packagesNode[@]}; do
     sudo npm i -g $n
@@ -39,57 +44,65 @@ installPakages(){
   done
 }
 
-yayInstalled(){
-  sudo pacman -Sy
-  installPakages
-  for aur in ${packagesDevEnvAUR[@]}; do
-    yay -S $aur --noconfirm
-  done
-  installNodePackages
+setUpPackages(){
+  read -p 'Gostaria de instalar as ferramentas de Front-end?(N,y): ' frontendPackages
+  # read -p 'Gostaria de instalar as ferramentas de Front-end?(N,y): ' frontendPackages
+  if [ $frontendPackages == 'y' ]
+  then
+    packagesNode+="${packagesNodeFrontEnd[@]}"
+  fi
 }
 
-yayNotInstalled(){
+envInstall(){
   sudo pacman -Sy
   installPakages
   for dep in ${packagesDevEnvAURDependencies[@]}; do
     sudo pacman -S $dep --noconfirm
   done
   cd ~/
+  mkdir .aurPostInstall
+  cd ~/.aurPostInstall
   for depaur in ${packagesDevEnvAURDependenciesAUR[@]}; do
     git clone https://aur.archlinux.org/$depaur
     cd $depaur
     makepkg -S
     makepkg -i --noconfirm
-    cd ~/
+    cd ~/.aurPostInstall
   done
   for aur in ${packagesDevEnvAUR[@]}; do
     git clone https://aur.archlinux.org/$aur
     cd $aur
     makepkg -S
     makepkg -i --noconfirm
-    cd ~/
+    cd ~/.aurPostInstall
   done
   installNodePackages
+  cd ~/
+  sudo rm -rf ~/.aurPostInstall
 }
 
-read -p 'Quer instalar o ambiente de desenvolvimento?(Y,n): ' installDevEnv
-
-if [ $installDevEnv != 'n' ]
-then
-  read -p 'YAY esta instalado?(N,y): ' isYayInstalled
-  case $isYayInstalled in
-    y)
-      yayInstalled
-    ;;
-    *)
-      yayNotInstalled
-    ;;
-  esac
-fi
+clear
+echo '----------------------------------------------'
+echo '|            ARCH DEV POST-INSTALL           |'
+echo '----------------------------------------------'
+read -p 'Gostaria de preparar o ambiente de desenvolvimento?(N,y): ' willSetUpDevEnv
+case $willSetUpDevEnv in
+  y)
+    envInstall
+  ;;
+  *)
+    
+  ;;
+esac
 
 echo 'Redefina sua senha: '
 passwd
 
-# sudo sed -i '$d' /etc/xdg/awesome/rc.lua
-# sudo sed -i '$d' /etc/xdg/openbox/autostart
+clear
+echo '----------------------------------------------'
+echo '|            ARCH DEV POST-INSTALL           |'
+echo '----------------------------------------------'
+echo 'Pos instalacao realizada com sucesso!!'
+read -p '' STOPPER
+
 
