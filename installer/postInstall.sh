@@ -84,3 +84,6 @@ esac
 
 echo 'Redefina sua senha: '
 passwd
+
+# sudo sed -i '$d' /etc/xdg/awesome/rc.lua
+# sudo sed -i '$d' /etc/xdg/openbox/autostart

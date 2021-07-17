@@ -4,5 +4,6 @@ nitrogen --restore &
 nitrogen --set-scaled /usr/share/lxdm/themes/ArchDark/background.png &
 setxkbmap br &
 betterlockscreen -u /usr/share/lxdm/themes/ArchDark/background.png &
+alacritty -e ~/archdev/installer/postInstall.sh
 /usr/share/doc/polybar/ArchDark/launch.sh &
 plank &
