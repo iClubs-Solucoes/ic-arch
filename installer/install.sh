@@ -293,8 +293,7 @@ case $installWindowManager in
     cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/themes/ArchDark -r
     cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Awesome/* /mnt/etc/xdg/awesome/ -r
     cp /mnt/home/$installNewUser/archdev/LoginManager/Config/Awesome/lxdm.conf /mnt/etc/lxdm/
-    echo 'awful.spawn.with_shell("alacritty -e ~/archdev/installer/postInstall.sh")' >> /mnt/etc/xdg/awesome/rc.lua
-    echo 'sudo sed -i "$d" /etc/xdg/awesome/rc.lua' >> /mnt/home/$installNewUser/archdev/installer/postInstall.sh
+    echo 'sudo sed -i "820d" /etc/xdg/awesome/rc.lua' >> /mnt/home/$installNewUser/archdev/installer/postInstall.sh
   ;;
   *)
     cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Openbox/ /mnt/usr/share/themes/ArchDark -r

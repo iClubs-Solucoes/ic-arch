@@ -72,18 +72,24 @@ yayNotInstalled(){
   installNodePackages
 }
 
-read -p 'YAY esta instalado?(N,y): ' isYayInstalled
-case $isYayInstalled in
-  y)
-    yayInstalled
-  ;;
-  *)
-    yayNotInstalled
-  ;;
-esac
+read -p 'Quer instalar o ambiente de desenvolvimento?(Y,n): ' installDevEnv
+
+if [ $installDevEnv != 'n' ]
+then
+  read -p 'YAY esta instalado?(N,y): ' isYayInstalled
+  case $isYayInstalled in
+    y)
+      yayInstalled
+    ;;
+    *)
+      yayNotInstalled
+    ;;
+  esac
+fi
 
 echo 'Redefina sua senha: '
 passwd
 
 # sudo sed -i '$d' /etc/xdg/awesome/rc.lua
 # sudo sed -i '$d' /etc/xdg/openbox/autostart
+
