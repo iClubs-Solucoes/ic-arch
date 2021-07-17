@@ -54,6 +54,7 @@ setUpPackages(){
 }
 
 envInstall(){
+  setUpPackages
   sudo pacman -Sy
   installPakages
   for dep in ${packagesDevEnvAURDependencies[@]}; do
