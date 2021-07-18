@@ -202,7 +202,7 @@ infoCheckScreen() {
     installWindowManagerLabel='Floating Window Manager'
   fi
 
-  if [ "$chosenLayout" != '' ]
+  if [ -z "$chosenLayout" ]
   then
     installKeyboardLayoutLabel="us"
   else
