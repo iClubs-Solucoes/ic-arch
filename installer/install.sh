@@ -400,7 +400,7 @@ themeConfig() {
 
 archInstall() {
 
-  if [ $installBootType == '2' ]
+  if [ "$installBootType" == '2' ]
   then
     legacyDiskSetUP
   else
