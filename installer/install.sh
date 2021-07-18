@@ -421,7 +421,7 @@ archInstall() {
     systemd-nspawn pacman -S $p --noconfirm
   done
 
-  if [ $installBootType == '2' ]
+  if [ "$installBootType" == '2' ]
   then
     legacyBootInstall
   else
@@ -447,7 +447,7 @@ finishInstallScreen() {
 
 main() {
   # Inicio do script de instalação
-  while [ $installInfoCheck != 'y' ]
+  while [ "$installInfoCheck" != 'y' ]
   do
     installInfoForm
     infoCheckScreen  
