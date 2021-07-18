@@ -81,6 +81,21 @@ packagesMinimum=(
   "xf86-video-intel"
 )
 
+# Pacotes para instalacoes em sistemas EFI
+efiPackages=(
+  "os-prober"
+  "efibootmgr"
+  "dosfstools"
+  "mtools"
+)
+
+# Layout de teclados disponiveis
+layoutKeyboards=(
+  "us"
+  "br-abnt2"
+)
+
+# Valor padrao para validacao de informacoes de instalacao
 installInfoCheck='n' 
 
 screenHeader() {
@@ -90,6 +105,22 @@ screenHeader() {
   echo '----------------------------------------------'
 }
 
+installKeyboardLayout() {
+  # loadkeys br-abnt2
+  read -p 'Deseja alterar o layout do teclado? (Padrao='${layoutKeyboards[0]}')' setNewLayout
+  if [ $setNewLayout == 'y' ]
+  then
+    echo 'Layout disponiveis: '
+    n=0
+    for l in "${layoutKeyboards[@]}"; do
+      echo $n') '$l
+      n=$(($n+1))
+    done
+    read -p 'Digite o numero do layout que deseja: ' chosenLayout
+    loadkeys ${layoutKeyboards[$chosenLayout]}
+  fi
+}
+
 installInfoForm() {
   screenHeader
 
@@ -97,8 +128,8 @@ installInfoForm() {
   echo 'Iniciando instalação ...'
   echo ''
 
-  # Seta o teclado para ABNT2
-  loadkeys br-abnt2
+  # Seta o padrao do teclado
+  installKeyboardLayout
 
   # Inicio de formulario para prosseguir com instalação
   echo ''
@@ -121,11 +152,21 @@ installInfoForm() {
   read -p 'Digite o nome de sua maquina: ' installHostName
   read -p 'Digite o nome do seu usuário: ' installNewUser
 
-  fdisk -l
+  # Tipo de boot para a maquina
+  echo ''
+  echo 'Qual tipo de boot deseja instalar :'
+  echo '1) EFI'
+  echo '2) Legacy BIOS'
+  echo ''
+  read -p '(padrão = 1): ' installBootType
+
+  # fdisk -l
+  echo 'Discos disponiveis no sistem: '
+  lsblk -d | grep disk
 
   read -p 'Disco para formatar: ' installDisk
 
-  read -p 'Tamanho da unidade de swap (coloque G ou MB após o numero): ' installDiskSwapSize
+  read -p 'Tamanho da unidade de swap (em MBs): ' installDiskSwapSize
   echo ''
 }
 
@@ -147,11 +188,25 @@ infoCheckScreen() {
     installTypeLabel='Completa'
   fi
 
+  if [ $installBootType == '2' ]
+  then
+    installBootTypeLabel='Legacy BIOS'
+  else
+    installBootTypeLabel='EFI'
+  fi
+
   if [ $installWindowManager == '2' ]
   then
     installWindowManagerLabel='Tiling Window Manager'
   else
     installWindowManagerLabel='Floating Window Manager'
+  fi
+
+  if [ $chosenLayout != '' ]
+  then
+    installKeyboardLayoutLabel="us"
+  else
+    installKeyboardLayoutLabel=${layoutKeyboards[$chosenLayout]}
   fi
 
   screenHeader
@@ -161,6 +216,8 @@ infoCheckScreen() {
   echo 'Window Manager: '$installWindowManagerLabel
   echo 'Nome de Maquina: '$installHostName
   echo 'Usuario: '$installNewUser
+  echo 'Layout de Teclado: '$installKeyboardLayoutLabel
+  echo 'Tipo de Boot: '$installBootTypeLabel
   echo 'Instalar YAY: '$installYay
   echo 'Formatar Disco: '$installDisk
   echo 'Tamanho de Swap: '$installDiskSwapSize
@@ -201,25 +258,57 @@ twmPackages() {
 
 legacyDiskSetUP() {
   # Particiona o disco
-  parted $installDisk mklabel msdos 
+  parted /dev/$installDisk mklabel msdos 
   ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
   ## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
-  echo i | parted -a opt $installDisk mkpart primary linux-swap 256M $installDiskSwapSize
-  echo i | parted -a opt $installDisk mkpart primary ext4 $installDiskSwapSize 100%
-  parted -a opt $installDisk set 2 boot on
+  echo i | parted -a opt /dev/$installDisk mkpart primary linux-swap 256M $installDiskSwapSize
+  echo i | parted -a opt /dev/$installDisk mkpart primary ext4 $installDiskSwapSize 100%
+  parted -a opt /dev/$installDisk set 2 boot on
 
   # Formata o disco
-  mkfs.ext4 $installDisk'2'
-  mkswap $installDisk'1'
+  mkfs.ext4 /dev/$installDisk'2'
+  mkswap /dev/$installDisk'1'
 
   # Monta o disco
-  mount $installDisk'2' /mnt
-  swapon $installDisk'1'
+  mount /dev/$installDisk'2' /mnt
+  swapon /dev/$installDisk'1'
 }
 
 legacyBootInstall() {
   # Instalando GRUB
   arch-chroot /mnt grub-install --target=i386-pc $installDisk
+  arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+}
+
+efiDiskSetUP() {
+  # Particiona o disco
+  parted /dev/$installDisk mklabel gpt 
+  ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
+  ## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
+  echo i | parted -a opt /dev/$installDisk mkpart primary efi 256 806
+  echo i | parted -a opt /dev/$installDisk mkpart primary linux-swap 806 $((806+$installDiskSwapSize))
+  echo i | parted -a opt /dev/$installDisk mkpart primary ext4 $((806+$installDiskSwapSize)) 100%
+  # parted -a opt /dev/$installDisk set 2 boot on
+
+  # Formata o disco
+  mkfs.ext4 /dev/$installDisk'3'
+  mkswap /dev/$installDisk'2'
+  mkfs.fat -F32 /dev/$installDisk'1'
+
+  # Monta o disco
+  mount /dev/$installDisk'3' /mnt
+  swapon /dev/$installDisk'2'
+  mkdir /mnt/boot
+  mkdir /mnt/boot/EFI
+  mount /dev/$installDisk'1' /mnt/boot/EFI
+
+  # Adiciona os pacotes necessarios para instalar grub
+  packages+=("${efiPackages[@]}")
+}
+
+efiBootInstall() {
+  # Instalando GRUB
+  arch-chroot /mnt grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
   arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 }
 
@@ -310,7 +399,13 @@ themeConfig() {
 }
 
 archInstall() {
-  legacyDiskSetUP
+
+  if [ $installBootType == '2' ]
+  then
+    legacyDiskSetUP
+  else
+    efiDiskSetUP
+  fi
 
   # Instalando sistema base
   pacstrap /mnt base linux linux-firmware
@@ -326,7 +421,13 @@ archInstall() {
     systemd-nspawn pacman -S $p --noconfirm
   done
 
-  legacyBootInstall
+  if [ $installBootType == '2' ]
+  then
+    legacyBootInstall
+  else
+    efiBootInstall
+  fi
+
   archBaseConfig
   aurHelperAndPackagesInstall
   servicesEnable
@@ -348,9 +449,7 @@ main() {
   # Inicio do script de instalação
   while [ $installInfoCheck != 'y' ]
   do
-
     installInfoForm
-
     infoCheckScreen  
 
     case $installInfoCheck in
