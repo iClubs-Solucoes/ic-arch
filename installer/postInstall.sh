@@ -20,6 +20,7 @@ packagesDevEnvAURDependencies=(
 packagesDevEnv=(
   "nodejs"
   "npm"
+  "openssh"
   "python"
 )
 
@@ -96,6 +97,10 @@ case $willSetUpDevEnv in
   ;;
 esac
 
+clear
+echo '----------------------------------------------'
+echo '|            ARCH DEV POST-INSTALL           |'
+echo '----------------------------------------------'
 echo 'Redefina sua senha: '
 passwd
 
@@ -104,6 +109,7 @@ echo '----------------------------------------------'
 echo '|            ARCH DEV POST-INSTALL           |'
 echo '----------------------------------------------'
 echo 'Pos instalacao realizada com sucesso!!'
+echo 'Pressione qualquer tecla para finalizar . . . '
 read -p '' STOPPER
 
 

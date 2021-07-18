@@ -83,14 +83,15 @@ packagesMinimum=(
 
 installInfoCheck='n' 
 
- # Inicio do script de instalação
-while [ $installInfoCheck != 'y' ]
-do
-
+screenHeader() {
   clear
   echo '----------------------------------------------'
   echo '|            ARCH DEV INSTALLER              |'
   echo '----------------------------------------------'
+}
+
+installInfoForm() {
+  screenHeader
 
   echo ''
   echo 'Iniciando instalação ...'
@@ -126,7 +127,9 @@ do
 
   read -p 'Tamanho da unidade de swap (coloque G ou MB após o numero): ' installDiskSwapSize
   echo ''
+}
 
+infoCheckScreen() {
   if [ -z "$installDiskSwapSize" ]
   then
     installDiskSwapSize='5G'
@@ -151,12 +154,7 @@ do
     installWindowManagerLabel='Floating Window Manager'
   fi
 
-  clear
-
-  echo '----------------------------------------------'
-  echo '|            ARCH DEV INSTALLER              |'
-  echo '----------------------------------------------'
-
+  screenHeader
   echo 'Resumo de Instalação'
   echo ''
   echo 'Tipo de Instalação: '$installTypeLabel
@@ -169,154 +167,212 @@ do
   echo ''
   echo 'Estas informações estão corretas?'
   read -p '(N,y): ' installInfoCheck
+}
 
-  case $installInfoCheck in
-    y)
-
+packagesPreparation() {
+  case $installWindowManager in
+    2)
+      twmPackages
     ;;
     *)
-      installInfoCheck='n'
+      fwmPackages
     ;;
   esac
 
-done
+  case $installType in
+    2)
+      packages+=("${packagesMinimum[@]}")
+    ;;
+    *)
+      packages+=("${packagesComplete[@]}")
+    ;;
+  esac
+}
 
-case $installWindowManager in
+fwmPackages() {
+  packages+=("${installPackagesFWM[@]}")
+  installAURPackages+=("${installAURFWM[@]}")
+}
+
+twmPackages() {
+  packages+=("${installPackagesTWM[@]}")
+  installAURPackages+=("${installAURTWM[@]}")
+}
+
+legacyDiskSetUP() {
+  # Particiona o disco
+  parted $installDisk mklabel msdos 
+  ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
+  ## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
+  echo i | parted -a opt $installDisk mkpart primary linux-swap 256M $installDiskSwapSize
+  echo i | parted -a opt $installDisk mkpart primary ext4 $installDiskSwapSize 100%
+  parted -a opt $installDisk set 2 boot on
+
+  # Formata o disco
+  mkfs.ext4 $installDisk'2'
+  mkswap $installDisk'1'
+
+  # Monta o disco
+  mount $installDisk'2' /mnt
+  swapon $installDisk'1'
+}
+
+legacyBootInstall() {
+  # Instalando GRUB
+  arch-chroot /mnt grub-install --target=i386-pc $installDisk
+  arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+}
+
+aurHelperAndPackagesInstall() {
+  # Instalando yay
+  case $installYay in
+    y)
+      systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.zst --noconfirm
+    ;;
+    *)
+
+    ;;
+  esac
+
+  # Instalando aplicações complementares para open box
+  for p in ${installAURPackages[@]}; do
+    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/$p.pkg.tar.zst --noconfirm
+  done
+}
+
+archBaseConfig() {
+  # Define senha padrão para root e cria usuarios
+  arch-chroot /mnt useradd -m -g users -G wheel -p '' $installNewUser
+
+  # Copiando folder de instalação para o sistema novo
+  cp /root/archdev /mnt/home/$installNewUser -r
+
+  # Removendo password pra comandos sudo para instalação
+  cp /mnt/home/$installNewUser/archdev/Config/Install\ sudo/* /mnt/etc/ -r
+
+  # Configuração basica de systema
+  ln -sf /mnt/usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+  echo 'pt_BR.UTF-8 UTF-8' >> /mnt/etc/locale.gen
+  arch-chroot /mnt locale-gen
+  echo 'KEYMAP=br-abnt2' >> /mnt/etc/vconsole.conf
+  echo $installHostName >> /mnt/etc/hostname
+  echo '127.0.0.1  localhost' >> /mnt/etc/hosts
+  echo '::1  localhost' >> /mnt/etc/hosts
+  echo '127.0.0.1  '$installHostName'.localdomain  localhost' >> /mnt/etc/hosts
+
+  # Auto inicializacao do pacote starship no bash shell
+  echo 'eval "$(starship init bash)"' >> /mnt/etc/bash.bashrc
+}
+
+servicesEnable() {
+  # Habilitando interface gráfica
+  systemd-nspawn systemctl enable NetworkManager.service
+  systemd-nspawn systemctl enable lxdm.service
+  systemd-nspawn systemctl enable --now systemd-timesyncd.service
+  systemd-nspawn systemctl enable --now systemd-time-await-sync.service
+}
+
+basicThemesConfig() {
+  # Configurando interface gráfica
+  cp /mnt/home/$installNewUser/archdev/LookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
+  cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK2/gtkrc /mnt/usr/share/gtk-2.0/gtkrc -r
+  cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK3/settings.ini /mnt/usr/share/gtk-3.0/settings.ini -r
+  cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/Icons/index.theme /mnt/usr/share/icons/default/index.theme -r
+  cp /mnt/home/$installNewUser/archdev/LookAndFeel/Plank/Theme/* /mnt/usr/share/plank/themes/Default/ -r
+  cp /mnt/home/$installNewUser/archdev/LookAndFeel/Polybar/Theme/ /mnt/usr/share/doc/polybar/ArchDark/ -r
+  cp /mnt/home/$installNewUser/archdev/LoginManager/Themes/* /mnt/usr/share/lxdm/themes/ArchDark -r
+}
+
+twmThemeConfig() {
+  cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/themes/ArchDark -r
+  cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Awesome/* /mnt/etc/xdg/awesome/ -r
+  cp /mnt/home/$installNewUser/archdev/LoginManager/Config/Awesome/lxdm.conf /mnt/etc/lxdm/
+  echo 'sudo sed -i "820d" /etc/xdg/awesome/rc.lua' >> /mnt/home/$installNewUser/archdev/installer/postInstall.sh
+}
+
+fwmThemeConfig() {
+  cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Openbox/ /mnt/usr/share/themes/ArchDark -r
+  cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Openbox/* /mnt/etc/xdg/openbox/ -r
+  cp /mnt/home/$installNewUser/archdev/LoginManager/Config/Openbox/lxdm.conf /mnt/etc/lxdm/
+  echo 'sudo sed -i "7d" /etc/xdg/openbox/autostart' >> /mnt/home/$installNewUser/archdev/installer/postInstall.sh
+}
+
+themeConfig() {
+  basicThemesConfig
+  case $installWindowManager in
   2)
-    packages+=("${installPackagesTWM[@]}")
-    installAURPackages+=("${installAURTWM[@]}")
+    twmThemeConfig
   ;;
   *)
-    packages+=("${installPackagesFWM[@]}")
-    installAURPackages+=("${installAURFWM[@]}")
+    fwmThemeConfig
   ;;
-esac
+  esac
+}
 
-case $installType in
-  2)
-    packages+=("${packagesMinimum[@]}")
-  ;;
-  *)
-    packages+=("${packagesComplete[@]}")
-  ;;
-esac
+archInstall() {
+  legacyDiskSetUP
 
-# Particiona o disco
-parted $installDisk mklabel msdos 
-## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
-## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
-echo i | parted -a opt $installDisk mkpart primary linux-swap 256M $installDiskSwapSize
-echo i | parted -a opt $installDisk mkpart primary ext4 $installDiskSwapSize 100%
-parted -a opt $installDisk set 2 boot on
+  # Instalando sistema base
+  pacstrap /mnt base linux linux-firmware
+  genfstab -U /mnt >> /mnt/etc/fstab
 
-# Formata o disco
-mkfs.ext4 $installDisk'2'
-mkswap $installDisk'1'
+  # Entrando na tree do sistema novo
+  cd /mnt
 
-# Monta o disco
-mount $installDisk'2' /mnt
-swapon $installDisk'1'
+  # Instalando pacotes
+  for p in ${packages[@]}; do
+    # echo 'instalando '$p
+    # read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
+    systemd-nspawn pacman -S $p --noconfirm
+  done
 
-# Instalando sistema base
-pacstrap /mnt base linux linux-firmware
-genfstab -U /mnt >> /mnt/etc/fstab
+  legacyBootInstall
+  archBaseConfig
+  aurHelperAndPackagesInstall
+  servicesEnable
+  themeConfig
 
-# Entrando na tree do sistema novo
-cd /mnt
+  # Instalando fontes
+  cp -rf /mnt/home/$installNewUser/archdev/Fonts/* /mnt/usr/share/fonts
+}
 
-# Instalando pacotes
-for p in ${packages[@]}; do
-  # echo 'instalando '$p
-  # read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
-  systemd-nspawn pacman -S $p --noconfirm
-done
+finishInstallScreen() {
+  # Mostrando neofetch para mostrar o fim do processo
+  screenHeader
+  echo 'Instalação finalizada'
+  arch-chroot /mnt neofetch
+  read -p 'press any key to continue.....' STOPPER
+}
 
-# Instalando GRUB
-arch-chroot /mnt grub-install --target=i386-pc $installDisk
-arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+main() {
+  # Inicio do script de instalação
+  while [ $installInfoCheck != 'y' ]
+  do
 
-# Define senha padrão para root e cria usuarios
-arch-chroot /mnt useradd -m -g users -G wheel -p '' $installNewUser
+    installInfoForm
 
-# Copiando folder de instalação para o sistema novo
-cp /root/archdev /mnt/home/$installNewUser -r
+    infoCheckScreen  
 
-# Removendo password pra comandos sudo para instalação
-cp /mnt/home/$installNewUser/archdev/Config/Install\ sudo/* /mnt/etc/ -r
+    case $installInfoCheck in
+      y)
 
-# Configuração basica de systema
-ln -sf /mnt/usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
-echo 'pt_BR.UTF-8 UTF-8' >> /mnt/etc/locale.gen
-arch-chroot /mnt locale-gen
-echo 'KEYMAP=br-abnt2' >> /mnt/etc/vconsole.conf
-echo $installHostName >> /mnt/etc/hostname
-echo '127.0.0.1  localhost' >> /mnt/etc/hosts
-echo '::1  localhost' >> /mnt/etc/hosts
-echo '127.0.0.1  '$installHostName'.localdomain  localhost' >> /mnt/etc/hosts
-echo 'eval "$(starship init bash)"' >> /mnt/etc/bash.bashrc
+      ;;
+      *)
+        installInfoCheck='n'
+      ;;
+    esac
 
-# Conseguindo privilegios sudo
-echo 'Initializing Installation'
+  done
 
-# Instalando yay
-case $installYay in
-  y)
-    systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.zst --noconfirm
-  ;;
-  *)
+  packagesPreparation
+  archInstall
+  finishInstallScreen
 
-  ;;
-esac
+  # Rebootando
+  reboot
+}
 
-# Instalando aplicações complementares para open box
-for p in ${installAURPackages[@]}; do
-  systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/$p.pkg.tar.zst --noconfirm
-done
-
-# Habilitando interface gráfica
-systemd-nspawn systemctl enable NetworkManager.service
-systemd-nspawn systemctl enable lxdm.service
-systemd-nspawn systemctl enable --now systemd-timesyncd.service
-systemd-nspawn systemctl enable --now systemd-time-await-sync.service
-
-# Configurando interface gráfica
-cp /mnt/home/$installNewUser/archdev/LookAndFeel/Icons/ /mnt/usr/share/icons/ArchDark -r
-cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK2/gtkrc /mnt/usr/share/gtk-2.0/gtkrc -r
-cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/GTK3/settings.ini /mnt/usr/share/gtk-3.0/settings.ini -r
-cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Themes/Icons/index.theme /mnt/usr/share/icons/default/index.theme -r
-cp /mnt/home/$installNewUser/archdev/LookAndFeel/Plank/Theme/* /mnt/usr/share/plank/themes/Default/ -r
-cp /mnt/home/$installNewUser/archdev/LookAndFeel/Polybar/Theme/ /mnt/usr/share/doc/polybar/ArchDark/ -r
-cp /mnt/home/$installNewUser/archdev/LoginManager/Themes/* /mnt/usr/share/lxdm/themes/ArchDark -r
-
-case $installWindowManager in
-  2)
-    cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Awesome/ /mnt/usr/share/themes/ArchDark -r
-    cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Awesome/* /mnt/etc/xdg/awesome/ -r
-    cp /mnt/home/$installNewUser/archdev/LoginManager/Config/Awesome/lxdm.conf /mnt/etc/lxdm/
-    echo 'sudo sed -i "820d" /etc/xdg/awesome/rc.lua' >> /mnt/home/$installNewUser/archdev/installer/postInstall.sh
-  ;;
-  *)
-    cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Openbox/ /mnt/usr/share/themes/ArchDark -r
-    cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Openbox/* /mnt/etc/xdg/openbox/ -r
-    cp /mnt/home/$installNewUser/archdev/LoginManager/Config/Openbox/lxdm.conf /mnt/etc/lxdm/
-    echo 'sudo sed -i "7d" /etc/xdg/openbox/autostart' >> /mnt/home/$installNewUser/archdev/installer/postInstall.sh
-  ;;
-esac
-
-# Instalando fontes
-cp -rf /mnt/home/$installNewUser/archdev/Fonts/* /mnt/usr/share/fonts
-
-# Mostrando neofetch para mostrar o fim do processo
-clear
-echo '----------------------------------------------'
-echo '|            ARCH DEV INSTALLER              |'
-echo '----------------------------------------------'
-echo 'Instalação finalizada'
-arch-chroot /mnt neofetch
-read -p 'press any key to continue.....' STOPPER
-
-# Rebootando
-reboot
+main
 
 ## Infos Extras
 # Para compilar pacotes AUR é necessario usar o comando extra-x86_64-build, esse comando ira gerar um instalaverl .pkg.tar.gz
