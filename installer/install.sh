@@ -107,8 +107,8 @@ screenHeader() {
 
 installKeyboardLayout() {
   # loadkeys br-abnt2
-  read -p 'Deseja alterar o layout do teclado? (Padrao='${layoutKeyboards[0]}')' setNewLayout
-  if [ $setNewLayout == 'y' ]
+  read -p 'Deseja alterar o layout do teclado? (Padrao='${layoutKeyboards[0]}' | N,y)' setNewLayout
+  if [ "$setNewLayout" == 'y' ]
   then
     echo 'Layout disponiveis: '
     n=0
@@ -173,7 +173,7 @@ installInfoForm() {
 infoCheckScreen() {
   if [ -z "$installDiskSwapSize" ]
   then
-    installDiskSwapSize='5G'
+    installDiskSwapSize='5000'
   fi
 
   if [ "$installYay" != 'y' ]
@@ -202,7 +202,7 @@ infoCheckScreen() {
     installWindowManagerLabel='Floating Window Manager'
   fi
 
-  if [ $chosenLayout != '' ]
+  if [ "$chosenLayout" != '' ]
   then
     installKeyboardLayoutLabel="us"
   else
@@ -220,7 +220,7 @@ infoCheckScreen() {
   echo 'Tipo de Boot: '$installBootTypeLabel
   echo 'Instalar YAY: '$installYay
   echo 'Formatar Disco: '$installDisk
-  echo 'Tamanho de Swap: '$installDiskSwapSize
+  echo 'Tamanho de Swap: '$installDiskSwapSize'M'
   echo ''
   echo 'Estas informações estão corretas?'
   read -p '(N,y): ' installInfoCheck
@@ -258,49 +258,49 @@ twmPackages() {
 
 legacyDiskSetUP() {
   # Particiona o disco
-  parted /dev/$installDisk mklabel msdos 
+  parted '/dev/'$installDisk mklabel msdos 
   ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
   ## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
-  echo i | parted -a opt /dev/$installDisk mkpart primary linux-swap 256M $installDiskSwapSize
-  echo i | parted -a opt /dev/$installDisk mkpart primary ext4 $installDiskSwapSize 100%
-  parted -a opt /dev/$installDisk set 2 boot on
+  echo i | parted -a opt '/dev/'$installDisk mkpart primary linux-swap 256 $((256+$installDiskSwapSize))
+  echo i | parted -a opt '/dev/'$installDisk mkpart primary ext4 $((256+$installDiskSwapSize)) 100%
+  parted -a opt '/dev/'$installDisk set 2 boot on
 
   # Formata o disco
-  mkfs.ext4 /dev/$installDisk'2'
-  mkswap /dev/$installDisk'1'
+  mkfs.ext4 '/dev/'$installDisk'2'
+  mkswap '/dev/'$installDisk'1'
 
   # Monta o disco
-  mount /dev/$installDisk'2' /mnt
-  swapon /dev/$installDisk'1'
+  mount '/dev/'$installDisk'2' /mnt
+  swapon '/dev/'$installDisk'1'
 }
 
 legacyBootInstall() {
   # Instalando GRUB
-  arch-chroot /mnt grub-install --target=i386-pc $installDisk
+  arch-chroot /mnt grub-install --target=i386-pc '/dev/'$installDisk
   arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 }
 
 efiDiskSetUP() {
   # Particiona o disco
-  parted /dev/$installDisk mklabel gpt 
+  parted '/dev/'$installDisk mklabel gpt 
   ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
   ## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
-  echo i | parted -a opt /dev/$installDisk mkpart primary efi 256 806
-  echo i | parted -a opt /dev/$installDisk mkpart primary linux-swap 806 $((806+$installDiskSwapSize))
-  echo i | parted -a opt /dev/$installDisk mkpart primary ext4 $((806+$installDiskSwapSize)) 100%
+  echo i | parted -a opt '/dev/'$installDisk mkpart primary efi 256 806
+  echo i | parted -a opt '/dev/'$installDisk mkpart primary linux-swap 806 $((806+$installDiskSwapSize))
+  echo i | parted -a opt '/dev/'$installDisk mkpart primary ext4 $((806+$installDiskSwapSize)) 100%
   # parted -a opt /dev/$installDisk set 2 boot on
 
   # Formata o disco
-  mkfs.ext4 /dev/$installDisk'3'
-  mkswap /dev/$installDisk'2'
-  mkfs.fat -F32 /dev/$installDisk'1'
+  mkfs.ext4 '/dev/'$installDisk'3'
+  mkswap '/dev/'$installDisk'2'
+  mkfs.fat -F32 '/dev/'$installDisk'1'
 
   # Monta o disco
-  mount /dev/$installDisk'3' /mnt
-  swapon /dev/$installDisk'2'
+  mount '/dev/'$installDisk'3' /mnt
+  swapon '/dev/'$installDisk'2'
   mkdir /mnt/boot
   mkdir /mnt/boot/EFI
-  mount /dev/$installDisk'1' /mnt/boot/EFI
+  mount '/dev/'$installDisk'1' /mnt/boot/EFI
 
   # Adiciona os pacotes necessarios para instalar grub
   packages+=("${efiPackages[@]}")
