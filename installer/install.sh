@@ -257,7 +257,7 @@ twmPackages() {
 
 legacyDiskSetUP() {
   ## Limpa o disco
-  sfdisk --delete '/dev/'$installDisk
+  echo 'yes' | sfdisk --delete '/dev/'$installDisk
   ## Particiona o disco
   parted '/dev/'$installDisk mklabel msdos 
   ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
