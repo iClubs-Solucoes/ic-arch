@@ -423,7 +423,7 @@ archInstall() {
     systemd-nspawn pacman -S $p --noconfirm
   done
 
-  systemd-nspawn pacman -S os-prober dosfstools mtools efibootmgr sudo --noconfirm
+  # systemd-nspawn pacman -S os-prober dosfstools mtools efibootmgr sudo --noconfirm
 
   if [ "$installBootType" == '2' ]
   then
