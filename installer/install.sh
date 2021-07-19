@@ -435,7 +435,7 @@ archInstall() {
   archBaseConfig
   # aurHelperAndPackagesInstall
   servicesEnable
-  # themeConfig
+  themeConfig
 
   # Instalando fontes
   cp -rf /mnt/home/$installNewUser/archdev/Fonts/* /mnt/usr/share/fonts
