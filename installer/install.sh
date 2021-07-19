@@ -385,7 +385,7 @@ fwmThemeConfig() {
   cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Openbox/ /mnt/usr/share/themes/ArchDark -r
   cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Openbox/* /mnt/etc/xdg/openbox/ -r
   cp /mnt/home/$installNewUser/archdev/LoginManager/Config/Openbox/lxdm.conf /mnt/etc/lxdm/
-  echo 'sudo sed -i "7d" /etc/xdg/openbox/autostart' >> /mnt/home/$installNewUser/archdev/installer/postInstall.sh
+  echo 'sudo sed -i "2d" /etc/xdg/openbox/autostart' >> /mnt/home/$installNewUser/archdev/installer/postInstall.sh
 }
 
 themeConfig() {
