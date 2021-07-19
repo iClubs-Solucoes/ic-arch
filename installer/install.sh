@@ -417,11 +417,13 @@ archInstall() {
   cd /mnt
 
   # Instalando pacotes
-  for p in ${packages[@]}; do
-    # echo 'instalando '$p
-    # read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
-    systemd-nspawn pacman -S $p --noconfirm
-  done
+  # for p in ${packages[@]}; do
+  #   # echo 'instalando '$p
+  #   # read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
+  #   systemd-nspawn pacman -S $p --noconfirm
+  # done
+
+  systemd-nspawn pacman -S nano networkmanager grub os-prober dosfstools mtools efibootmgr sudo --noconfirm
 
   if [ "$installBootType" == '2' ]
   then
@@ -430,13 +432,13 @@ archInstall() {
     efiBootInstall
   fi
 
-  archBaseConfig
-  aurHelperAndPackagesInstall
-  servicesEnable
-  themeConfig
+  # archBaseConfig
+  # aurHelperAndPackagesInstall
+  # servicesEnable
+  # themeConfig
 
   # Instalando fontes
-  cp -rf /mnt/home/$installNewUser/archdev/Fonts/* /mnt/usr/share/fonts
+  # cp -rf /mnt/home/$installNewUser/archdev/Fonts/* /mnt/usr/share/fonts
 }
 
 finishInstallScreen() {
