@@ -433,7 +433,7 @@ archInstall() {
   fi
 
   archBaseConfig
-  # aurHelperAndPackagesInstall
+  aurHelperAndPackagesInstall
   servicesEnable
   themeConfig
 
