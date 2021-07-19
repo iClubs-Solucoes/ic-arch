@@ -416,14 +416,14 @@ archInstall() {
   # Entrando na tree do sistema novo
   cd /mnt
 
-  # Instalando pacotes
-  # for p in ${packages[@]}; do
-  #   # echo 'instalando '$p
-  #   # read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
-  #   systemd-nspawn pacman -S $p --noconfirm
-  # done
+  Instalando pacotes
+  for p in ${packages[@]}; do
+    # echo 'instalando '$p
+    # read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
+    systemd-nspawn pacman -S $p --noconfirm
+  done
 
-  systemd-nspawn pacman -S nano networkmanager grub os-prober dosfstools mtools efibootmgr sudo --noconfirm
+  systemd-nspawn pacman -S os-prober dosfstools mtools efibootmgr sudo --noconfirm
 
   if [ "$installBootType" == '2' ]
   then
