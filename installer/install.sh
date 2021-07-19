@@ -257,9 +257,9 @@ twmPackages() {
 
 legacyDiskSetUP() {
   ## Limpa o disco
-  yes | sfdisk --delete '/dev/'$installDisk
+  sfdisk --delete '/dev/'$installDisk
   ## Particiona o disco
-  parted '/dev/'$installDisk mklabel msdos 
+  yes | parted '/dev/'$installDisk mklabel msdos 
   ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
   ## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
   echo i | parted -a opt '/dev/'$installDisk mkpart primary linux-swap 256 $((256+$installDiskSwapSize))
@@ -285,7 +285,7 @@ efiDiskSetUP() {
   ## Limpa o disco
   sfdisk --delete '/dev/'$installDisk
   ## Particiona o disco
-  parted '/dev/'$installDisk mklabel gpt 
+  yes | parted '/dev/'$installDisk mklabel gpt 
   ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
   ## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
   parted -a opt '/dev/'$installDisk mkpart primary fat32 256 806
