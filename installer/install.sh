@@ -288,10 +288,12 @@ efiDiskSetUP() {
   parted '/dev/'$installDisk mklabel gpt 
   ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
   ## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
-  echo i | parted -a opt '/dev/'$installDisk mkpart primary fat32 256 806
-  echo i | parted -a opt '/dev/'$installDisk mkpart primary linux-swap 806 $((806+$installDiskSwapSize))
-  echo i | parted -a opt '/dev/'$installDisk mkpart primary ext4 $((806+$installDiskSwapSize)) 100%
-  ## parted -a opt /dev/$installDisk set 2 boot on
+  parted -a opt '/dev/'$installDisk mkpart primary fat32 256 806
+  parted -a opt '/dev/'$installDisk mkpart primary linux-swap 806 $installDiskSwapSize
+  # parted -a opt '/dev/'$installDisk mkpart primary linux-swap 806 $((806+$installDiskSwapSize))
+  parted -a opt '/dev/'$installDisk mkpart primary ext4 $installDiskSwapSize 100%
+  # parted -a opt '/dev/'$installDisk mkpart primary ext4 $((806+$installDiskSwapSize)) 100%
+  # parted -a opt /dev/$installDisk set 2 boot on
 
   ## Formata o disco
   mkfs.ext4 '/dev/'$installDisk'3'
@@ -386,7 +388,7 @@ fwmThemeConfig() {
   cp /mnt/home/$installNewUser/archdev/LookAndFeel/Theme/Openbox/ /mnt/usr/share/themes/ArchDark -r
   cp /mnt/home/$installNewUser/archdev/LookAndFeel/Config/Openbox/* /mnt/etc/xdg/openbox/ -r
   cp /mnt/home/$installNewUser/archdev/LoginManager/Config/Openbox/lxdm.conf /mnt/etc/lxdm/
-  echo 'sudo sed -i "7d" /etc/xdg/openbox/autostart' >> /mnt/home/$installNewUser/archdev/installer/postInstall.sh
+  echo 'sudo sed -i "2d" /etc/xdg/openbox/autostart' >> /mnt/home/$installNewUser/archdev/installer/postInstall.sh
 }
 
 themeConfig() {
@@ -403,7 +405,7 @@ themeConfig() {
 
 archInstall() {
 
-  if [ $installBootType == '2' ]
+  if [ "$installBootType" == '2' ]
   then
     legacyDiskSetUP
   else
@@ -417,14 +419,16 @@ archInstall() {
   # Entrando na tree do sistema novo
   cd /mnt
 
-  # Instalando pacotes
+  Instalando pacotes
   for p in ${packages[@]}; do
     # echo 'instalando '$p
     # read -t 5 -p 'Pressione qualquer tecla para continuar com a instação ... ' STOPPER
     systemd-nspawn pacman -S $p --noconfirm
   done
 
-  if [ $installBootType == '2' ]
+  # systemd-nspawn pacman -S os-prober dosfstools mtools efibootmgr sudo --noconfirm
+
+  if [ "$installBootType" == '2' ]
   then
     legacyBootInstall
   else
@@ -450,7 +454,7 @@ finishInstallScreen() {
 
 main() {
   # Inicio do script de instalação
-  while [ $installInfoCheck != 'y' ]
+  while [ "$installInfoCheck" != 'y' ]
   do
     installInfoForm
     infoCheckScreen  
