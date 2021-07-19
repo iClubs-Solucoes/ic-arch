@@ -432,13 +432,13 @@ archInstall() {
     efiBootInstall
   fi
 
-  # archBaseConfig
+  archBaseConfig
   # aurHelperAndPackagesInstall
   servicesEnable
   # themeConfig
 
   # Instalando fontes
-  # cp -rf /mnt/home/$installNewUser/archdev/Fonts/* /mnt/usr/share/fonts
+  cp -rf /mnt/home/$installNewUser/archdev/Fonts/* /mnt/usr/share/fonts
 }
 
 finishInstallScreen() {
