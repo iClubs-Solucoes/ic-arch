@@ -434,7 +434,7 @@ archInstall() {
 
   # archBaseConfig
   # aurHelperAndPackagesInstall
-  # servicesEnable
+  servicesEnable
   # themeConfig
 
   # Instalando fontes
