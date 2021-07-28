@@ -161,10 +161,9 @@ installInfoForm() {
   read -p '(padrão = 1): ' installBootType
 
   # fdisk -l
-  echo 'Discos disponiveis no sistem: '
+  echo 'Discos disponiveis no sistem (O disco sera formatado para que o sistema seja instalado): '
   lsblk -d | grep disk
-
-  read -p 'Disco para formatar: ' installDisk
+  read -p 'Disco para formatar: ' installDisk 
 
   read -p 'Tamanho da unidade de swap (em MBs): ' installDiskSwapSize
   echo ''
@@ -219,7 +218,7 @@ infoCheckScreen() {
   echo 'Layout de Teclado: '$installKeyboardLayoutLabel
   echo 'Tipo de Boot: '$installBootTypeLabel
   echo 'Instalar YAY: '$installYay
-  echo 'Formatar Disco: '$installDisk
+  echo 'Formatar e Instalar no Disco: '$installDisk
   echo 'Tamanho de Swap: '$installDiskSwapSize'M'
   echo ''
   echo 'Estas informações estão corretas?'
@@ -257,32 +256,36 @@ twmPackages() {
 }
 
 legacyDiskSetUP() {
-  # Particiona o disco
-  parted '/dev/'$installDisk mklabel msdos 
+  ## Limpa o disco
+  sfdisk --delete '/dev/'$installDisk
+  ## Particiona o disco
+  yes | parted '/dev/'$installDisk mklabel msdos 
   ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
   ## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
   echo i | parted -a opt '/dev/'$installDisk mkpart primary linux-swap 256 $((256+$installDiskSwapSize))
   echo i | parted -a opt '/dev/'$installDisk mkpart primary ext4 $((256+$installDiskSwapSize)) 100%
   parted -a opt '/dev/'$installDisk set 2 boot on
 
-  # Formata o disco
+  ## Formata o disco
   mkfs.ext4 '/dev/'$installDisk'2'
   mkswap '/dev/'$installDisk'1'
 
-  # Monta o disco
+  ## Monta o disco
   mount '/dev/'$installDisk'2' /mnt
   swapon '/dev/'$installDisk'1'
 }
 
 legacyBootInstall() {
-  # Instalando GRUB
+  ## Instalando GRUB
   arch-chroot /mnt grub-install --target=i386-pc '/dev/'$installDisk
   arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 }
 
 efiDiskSetUP() {
-  # Particiona o disco
-  parted '/dev/'$installDisk mklabel gpt 
+  ## Limpa o disco
+  sfdisk --delete '/dev/'$installDisk
+  ## Particiona o disco
+  yes | parted '/dev/'$installDisk mklabel gpt 
   ## Para tornar um disco com label msdos bootable com o grub é necessário deixar libre 2047 sectores antes da primeira partição.
   ## echo i | parted -a opt $installDisk mkpart primary linux-swap 1024 $installDiskSwapSize
   parted -a opt '/dev/'$installDisk mkpart primary fat32 256 806
@@ -292,19 +295,19 @@ efiDiskSetUP() {
   # parted -a opt '/dev/'$installDisk mkpart primary ext4 $((806+$installDiskSwapSize)) 100%
   # parted -a opt /dev/$installDisk set 2 boot on
 
-  # Formata o disco
+  ## Formata o disco
   mkfs.ext4 '/dev/'$installDisk'3'
   mkswap '/dev/'$installDisk'2'
   mkfs.fat -F32 '/dev/'$installDisk'1'
 
-  # Monta o disco
+  ## Monta o disco
   mount '/dev/'$installDisk'3' /mnt
   swapon '/dev/'$installDisk'2'
   mkdir /mnt/boot
   mkdir /mnt/boot/EFI
   mount '/dev/'$installDisk'1' /mnt/boot/EFI
 
-  # Adiciona os pacotes necessarios para instalar grub
+  ## Adiciona os pacotes necessarios para instalar grub
   packages+=("${efiPackages[@]}")
 }
 
