@@ -454,8 +454,6 @@ finishInstallScreen() {
 
 main() {
   # Inicio do script de instalação
-  pacman -Sy
-  pacman -S dialog --noconfirm
   while [ "$installInfoCheck" != 'y' ]
   do
     installInfoForm

@@ -1,1 +1,0 @@
-dialog --inputbox “Digite seu nome:” 10 20 2>nome.txt
