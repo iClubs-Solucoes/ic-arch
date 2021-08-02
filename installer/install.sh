@@ -252,7 +252,8 @@ infoCheckScreen() {
     installKeyboardLayoutLabel=${layoutKeyboards[$chosenLayout]}
   fi
 
-  dialog --title "Resumo de Instalacao"
+  dialog --title "Resumo de Instalacao" \
+         --clear \
          --yesno "Tipo de Instalação: $installTypeLabel
                   \nWindow Manager: $installWindowManagerLabel
                   \nNome de Maquina: $installHostName
@@ -263,6 +264,7 @@ infoCheckScreen() {
                   \nFormatar e Instalar no Disco: $installDisk
                   \nTamanho de Swap: $installDiskSwapSize M"
   installInfoCheck=$?
+
   # screenHeader
   # echo 'Resumo de Instalação'
   # echo ''
