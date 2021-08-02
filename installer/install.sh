@@ -132,12 +132,18 @@ installInfoForm() {
   # installKeyboardLayout
 
   # Inicio de formulario para prosseguir com instalação
-  installType=$(dialog --title "Window Manager" \
+  installType=$(dialog --title "Tipo de Instalacao" \
                        --clear \
-                       --radiolist "Escolha o ambiente: " 20 61 5 \
+                       --radiolist "Escolha o tipo de instalacao de sistema: " 10 50 5 \
                        1 "Completa" ON \
                        2 "Minima" off \
                        2>&1 >/dev/tty)
+  dialogExit=$?
+  if [ "$dialogExit" == "1" ]
+  then
+    exit 1
+  fi
+
   # echo ''
   # echo 'Você gostaria de realizar a instalação :'
   # echo '1) Completa'
@@ -148,10 +154,15 @@ installInfoForm() {
   # Formulario para prosseguir com a instação do window manager
   installWindowManager=$(dialog --title "Window Manager" \
                                 --clear \
-                                --radiolist "Escolha o ambiente: " 20 61 5 \
+                                --radiolist "Escolha o ambiente: " 10 50 5 \
                                 1 "Floating Window Manager" ON \
                                 2 "Tiling Window Manager" off \
                                 2>&1 >/dev/tty)
+                                dialogExit=$?
+  if [ "$dialogExit" == "1" ]
+  then
+    exit 1
+  fi
   # echo ''
   # echo 'Escolha o ambiente:'
   # echo '1) Floating Window Manager'
@@ -159,32 +170,47 @@ installInfoForm() {
   # echo ''
   # read -p '(padrão = 1): ' installWindowManager
 
-  dialog  --title "Auxiliar AUR" \ 
-          --clear \ 
-          --yesno "Deseja instalar o auxiliar AUR YAY?" 10 60
+    dialog --title "Auxiliar AUR" \
+           --clear \
+           --yesno "Deseja instalar o auxiliar AUR YAY?" 7 40
   installYay=$?
   # echo 'Você gostaria de instalar o assistente yay para pacotes AUR?'
   # read -p '(N,y): ' installYay
 
-  installHostName=$(dialog  --title "Configuracao de Sistema" \ 
-                            --clear \
-                            --inputbox "Digite o nome de sua maquina" 8 40 \
-                            --stdout)
+  installHostName=$(dialog --title "Configuracao de Sistema" \
+                           --clear \
+                           --inputbox "Digite o nome do sua maquina" 8 40 \
+                           --stdout)
+  dialogExit=$?
+  if [ "$dialogExit" == "1" ]
+  then
+    exit 1
+  fi
   # read -p 'Digite o nome de sua maquina: ' installHostName
   
   installNewUser=$(dialog --title "Configuracao de Sistema" \
                           --clear \
-                          --inputbox "Digite o nome do seu usuário" 8 40 \
+                          --inputbox "Digite o nome do seu usuario" 8 40 \
                           --stdout)
+  dialogExit=$?
+  if [ "$dialogExit" == "1" ]
+  then
+    exit 1
+  fi
   # read -p 'Digite o nome do seu usuário: ' installNewUser
 
   # Tipo de boot para a maquina
   installBootType=$(dialog --title "BOOT" \
                            --clear \
-                           --radiolist "Qual tipo de boot deseja instalar: " 20 61 5 \
+                           --radiolist "Qual tipo de boot deseja instalar: " 10 50 5 \
                            1 "EFI" ON \
                            2 "Legacy BIOS" off \
                            2>&1 >/dev/tty)
+  dialogExit=$?
+  if [ "$dialogExit" == "1" ]
+  then
+    exit 1
+  fi
   # echo ''
   # echo 'Qual tipo de boot deseja instalar :'
   # echo '1) EFI'
@@ -193,9 +219,7 @@ installInfoForm() {
   # read -p '(padrão = 1): ' installBootType
 
   # fdisk -l
-  lsblk -d | dialog --title "Discos disponiveis no sistema" \
-                    --clear \
-                    --programbox 15 45
+  lsblk -d | dialog --title "Discos disponiveis no sistema" --clear --programbox 15 45
   # echo 'Discos disponiveis no sistem (O disco sera formatado para que o sistema seja instalado): '
   # lsblk -d | grep disk
 
@@ -203,12 +227,22 @@ installInfoForm() {
                        --clear \
                        --inputbox "Disco para instalacao de sistema" 8 40 \
                        --stdout)
+  dialogExit=$?
+  if [ "$dialogExit" == "1" ]
+  then
+    exit 1
+  fi
   # read -p 'Disco para formatar: ' installDisk 
 
   installDiskSwapSize=$(dialog --title "Partionamento de Disco" \
                                --clear \
                                --inputbox "Tamanho da unidade de swap (em MBs)" 8 40 \
                                --stdout)
+  dialogExit=$?
+  if [ "$dialogExit" == "1" ]
+  then
+    exit 1
+  fi
   # read -p 'Tamanho da unidade de swap (em MBs): ' installDiskSwapSize
   # echo ''
 }
@@ -219,9 +253,11 @@ infoCheckScreen() {
     installDiskSwapSize='5000'
   fi
 
-  if [ "$installYay" != 'y' ]
+  if [ $installYay == '0' ]
   then
-    installYay='n'
+    installYayLabel='Sim'
+  else
+    installYayLabel='Nao'
   fi
 
   if [ $installType == '2' ]
@@ -245,24 +281,16 @@ infoCheckScreen() {
     installWindowManagerLabel='Floating Window Manager'
   fi
 
-  if [ -z "$chosenLayout" ]
-  then
-    installKeyboardLayoutLabel="us"
-  else
-    installKeyboardLayoutLabel=${layoutKeyboards[$chosenLayout]}
-  fi
-
   dialog --title "Resumo de Instalacao" \
          --clear \
-         --yesno "Tipo de Instalação: $installTypeLabel
+         --yesno "Tipo de Instalacao: $installTypeLabel
                   \nWindow Manager: $installWindowManagerLabel
                   \nNome de Maquina: $installHostName
                   \nUsuario: $installNewUser
-                  \nLayout de Teclado: $installKeyboardLayoutLabel
                   \nTipo de Boot: $installBootTypeLabel
-                  \nInstalar YAY: $installYay
+                  \nInstalar YAY: $installYayLabel
                   \nFormatar e Instalar no Disco: $installDisk
-                  \nTamanho de Swap: $installDiskSwapSize M"
+                  \nTamanho de Swap: $installDiskSwapSize M" 15 40
   installInfoCheck=$?
 
   # screenHeader
@@ -377,7 +405,7 @@ efiBootInstall() {
 aurHelperAndPackagesInstall() {
   # Instalando yay
   case $installYay in
-    y)
+    0)
       systemd-nspawn pacman -U /home/$installNewUser/archdev/Packages/yay.pkg.tar.zst --noconfirm
     ;;
     *)
@@ -529,7 +557,6 @@ main() {
 
   done
 
-  exit 1
   packagesPreparation
   archInstall
   finishInstallScreen
