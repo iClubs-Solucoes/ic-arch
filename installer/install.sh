@@ -90,83 +90,127 @@ efiPackages=(
 )
 
 # Layout de teclados disponiveis
-layoutKeyboards=(
-  "us"
-  "br-abnt2"
-)
+# layoutKeyboards=(
+#   "us"
+#   "br-abnt2"
+# )
 
 # Valor padrao para validacao de informacoes de instalacao
-installInfoCheck='n' 
+installInfoCheck='1' 
 
-screenHeader() {
-  clear
-  echo '----------------------------------------------'
-  echo '|            ARCH DEV INSTALLER              |'
-  echo '----------------------------------------------'
-}
+# screenHeader() {
+#   clear
+#   echo '----------------------------------------------'
+#   echo '|            ARCH DEV INSTALLER              |'
+#   echo '----------------------------------------------'
+# }
 
-installKeyboardLayout() {
-  # loadkeys br-abnt2
-  read -p 'Deseja alterar o layout do teclado? (Padrao='${layoutKeyboards[0]}' | N,y)' setNewLayout
-  if [ "$setNewLayout" == 'y' ]
-  then
-    echo 'Layout disponiveis: '
-    n=0
-    for l in "${layoutKeyboards[@]}"; do
-      echo $n') '$l
-      n=$(($n+1))
-    done
-    read -p 'Digite o numero do layout que deseja: ' chosenLayout
-    loadkeys ${layoutKeyboards[$chosenLayout]}
-  fi
-}
+# installKeyboardLayout() {
+#   # loadkeys br-abnt2
+#   read -p 'Deseja alterar o layout do teclado? (Padrao='${layoutKeyboards[0]}' | N,y)' setNewLayout
+#   if [ "$setNewLayout" == 'y' ]
+#   then
+#     echo 'Layout disponiveis: '
+#     n=0
+#     for l in "${layoutKeyboards[@]}"; do
+#       echo $n') '$l
+#       n=$(($n+1))
+#     done
+#     read -p 'Digite o numero do layout que deseja: ' chosenLayout
+#     loadkeys ${layoutKeyboards[$chosenLayout]}
+#   fi
+# }
 
 installInfoForm() {
-  screenHeader
+  # screenHeader
 
-  echo ''
-  echo 'Iniciando instalação ...'
-  echo ''
+  # echo ''
+  # echo 'Iniciando instalação ...'
+  # echo ''
 
-  # Seta o padrao do teclado
-  installKeyboardLayout
+  # # Seta o padrao do teclado
+  # installKeyboardLayout
 
   # Inicio de formulario para prosseguir com instalação
-  echo ''
-  echo 'Você gostaria de realizar a instalação :'
-  echo '1) Completa'
-  echo '2) Minima'
-  echo ''
-  read -p '(padrão = 1): ' installType
+  installType=$(dialog --title "Window Manager" \
+                       --clear \
+                       --radiolist "Escolha o ambiente: " 20 61 5 \
+                       1 "Completa" ON \
+                       2 "Minima" off \
+                       2>&1 >/dev/tty)
+  # echo ''
+  # echo 'Você gostaria de realizar a instalação :'
+  # echo '1) Completa'
+  # echo '2) Minima'
+  # echo ''
+  # read -p '(padrão = 1): ' installType
 
   # Formulario para prosseguir com a instação do window manager
-  echo ''
-  echo 'Escolha o ambiente:'
-  echo '1) Floating Window Manager'
-  echo '2) Tiling Window Manager'
-  echo ''
-  read -p '(padrão = 1): ' installWindowManager
+  installWindowManager=$(dialog --title "Window Manager" \
+                                --clear \
+                                --radiolist "Escolha o ambiente: " 20 61 5 \
+                                1 "Floating Window Manager" ON \
+                                2 "Tiling Window Manager" off \
+                                2>&1 >/dev/tty)
+  # echo ''
+  # echo 'Escolha o ambiente:'
+  # echo '1) Floating Window Manager'
+  # echo '2) Tiling Window Manager'
+  # echo ''
+  # read -p '(padrão = 1): ' installWindowManager
 
-  echo 'Você gostaria de instalar o assistente yay para pacotes AUR?'
-  read -p '(N,y): ' installYay
-  read -p 'Digite o nome de sua maquina: ' installHostName
-  read -p 'Digite o nome do seu usuário: ' installNewUser
+  dialog  --title "Auxiliar AUR" \ 
+          --clear \ 
+          --yesno "Deseja instalar o auxiliar AUR YAY?" 10 60
+  installYay=$?
+  # echo 'Você gostaria de instalar o assistente yay para pacotes AUR?'
+  # read -p '(N,y): ' installYay
+
+  installHostName=$(dialog  --title "Configuracao de Sistema" \ 
+                            --clear \
+                            --inputbox "Digite o nome de sua maquina" 8 40 \
+                            --stdout)
+  # read -p 'Digite o nome de sua maquina: ' installHostName
+  
+  installNewUser=$(dialog --title "Configuracao de Sistema" \
+                          --clear \
+                          --inputbox "Digite o nome do seu usuário" 8 40 \
+                          --stdout)
+  # read -p 'Digite o nome do seu usuário: ' installNewUser
 
   # Tipo de boot para a maquina
-  echo ''
-  echo 'Qual tipo de boot deseja instalar :'
-  echo '1) EFI'
-  echo '2) Legacy BIOS'
-  echo ''
-  read -p '(padrão = 1): ' installBootType
+  installBootType=$(dialog --title "BOOT" \
+                           --clear \
+                           --radiolist "Qual tipo de boot deseja instalar: " 20 61 5 \
+                           1 "EFI" ON \
+                           2 "Legacy BIOS" off \
+                           2>&1 >/dev/tty)
+  # echo ''
+  # echo 'Qual tipo de boot deseja instalar :'
+  # echo '1) EFI'
+  # echo '2) Legacy BIOS'
+  # echo ''
+  # read -p '(padrão = 1): ' installBootType
 
   # fdisk -l
-  echo 'Discos disponiveis no sistem (O disco sera formatado para que o sistema seja instalado): '
-  lsblk -d | grep disk
-  read -p 'Disco para formatar: ' installDisk 
+  lsblk -d | dialog --title "Discos disponiveis no sistema" \
+                    --clear \
+                    --programbox 15 45
+  # echo 'Discos disponiveis no sistem (O disco sera formatado para que o sistema seja instalado): '
+  # lsblk -d | grep disk
 
-  read -p 'Tamanho da unidade de swap (em MBs): ' installDiskSwapSize
-  echo ''
+  installDisk=$(dialog --title "Partionamento de Disco" \
+                       --clear \
+                       --inputbox "Disco para instalacao de sistema" 8 40 \
+                       --stdout)
+  # read -p 'Disco para formatar: ' installDisk 
+
+  installDiskSwapSize=$(dialog --title "Partionamento de Disco" \
+                               --clear \
+                               --inputbox "Tamanho da unidade de swap (em MBs)" 8 40 \
+                               --stdout)
+  # read -p 'Tamanho da unidade de swap (em MBs): ' installDiskSwapSize
+  # echo ''
 }
 
 infoCheckScreen() {
@@ -208,21 +252,32 @@ infoCheckScreen() {
     installKeyboardLayoutLabel=${layoutKeyboards[$chosenLayout]}
   fi
 
-  screenHeader
-  echo 'Resumo de Instalação'
-  echo ''
-  echo 'Tipo de Instalação: '$installTypeLabel
-  echo 'Window Manager: '$installWindowManagerLabel
-  echo 'Nome de Maquina: '$installHostName
-  echo 'Usuario: '$installNewUser
-  echo 'Layout de Teclado: '$installKeyboardLayoutLabel
-  echo 'Tipo de Boot: '$installBootTypeLabel
-  echo 'Instalar YAY: '$installYay
-  echo 'Formatar e Instalar no Disco: '$installDisk
-  echo 'Tamanho de Swap: '$installDiskSwapSize'M'
-  echo ''
-  echo 'Estas informações estão corretas?'
-  read -p '(N,y): ' installInfoCheck
+  dialog --title "Resumo de Instalacao"
+         --yesno "Tipo de Instalação: $installTypeLabel
+                  \nWindow Manager: $installWindowManagerLabel
+                  \nNome de Maquina: $installHostName
+                  \nUsuario: $installNewUser
+                  \nLayout de Teclado: $installKeyboardLayoutLabel
+                  \nTipo de Boot: $installBootTypeLabel
+                  \nInstalar YAY: $installYay
+                  \nFormatar e Instalar no Disco: $installDisk
+                  \nTamanho de Swap: $installDiskSwapSize M"
+  installInfoCheck=$?
+  # screenHeader
+  # echo 'Resumo de Instalação'
+  # echo ''
+  # echo 'Tipo de Instalação: '$installTypeLabel
+  # echo 'Window Manager: '$installWindowManagerLabel
+  # echo 'Nome de Maquina: '$installHostName
+  # echo 'Usuario: '$installNewUser
+  # echo 'Layout de Teclado: '$installKeyboardLayoutLabel
+  # echo 'Tipo de Boot: '$installBootTypeLabel
+  # echo 'Instalar YAY: '$installYay
+  # echo 'Formatar e Instalar no Disco: '$installDisk
+  # echo 'Tamanho de Swap: '$installDiskSwapSize'M'
+  # echo ''
+  # echo 'Estas informações estão corretas?'
+  # read -p '(N,y): ' installInfoCheck
 }
 
 packagesPreparation() {
@@ -456,22 +511,23 @@ main() {
   # Inicio do script de instalação
   pacman -Sy
   pacman -S dialog --noconfirm
-  while [ "$installInfoCheck" != 'y' ]
+  while [ "$installInfoCheck" != '0' ]
   do
     installInfoForm
     infoCheckScreen  
 
     case $installInfoCheck in
-      y)
+      0)
 
       ;;
-      *)
-        installInfoCheck='n'
+      1)
+        installInfoCheck='1'
       ;;
     esac
 
   done
 
+  exit 1
   packagesPreparation
   archInstall
   finishInstallScreen
